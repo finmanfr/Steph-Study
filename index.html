@@ -137,12 +137,89 @@
     font-size: 20px;
     cursor: pointer;
     text-align: center;
+    width: 150px;
   }
   .folder:hover { background-color: #e3e3e3; }
   .folder-icon {
     font-size: 40px;
     display: block;
     color: #0A66C2;
+  }
+
+  /* Flashcard Viewer */
+  .flashcard-screen {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #FFD83B;
+    position: relative;
+  }
+
+  .flashcard {
+    background: white;
+    width: 400px;
+    height: 250px;
+    border-radius: 15px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+    cursor: pointer;
+    transition: transform 0.6s;
+  }
+
+  .flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+  }
+
+  .flashcard.flip .flashcard-inner {
+    transform: rotateY(180deg);
+  }
+
+  .flashcard-front, .flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 26px;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .flashcard-front {
+    color: #0A66C2;
+  }
+
+  .flashcard-back {
+    background: #0A66C2;
+    color: white;
+    transform: rotateY(180deg);
+  }
+
+  .nav-btns {
+    margin-top: 20px;
+  }
+  .nav-btns button {
+    background-color: #0A66C2;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 15px;
+    font-size: 18px;
+    margin: 0 10px;
+    cursor: pointer;
+  }
+  .nav-btns button:hover {
+    background-color: #084c8d;
   }
 </style>
 </head>
@@ -190,8 +267,27 @@ Molecule - Two or more atoms bonded"></textarea>
   <div id="folderList" class="folder-list"></div>
 </div>
 
+<!-- FLASHCARD VIEWER -->
+<div id="flashcard-screen" class="screen flashcard-screen">
+  <div class="back" onclick="showFolders()">← Back</div>
+  <h1 id="folderTitle"></h1>
+  <div class="flashcard" onclick="flipCard()">
+    <div class="flashcard-inner">
+      <div class="flashcard-front" id="cardFront"></div>
+      <div class="flashcard-back" id="cardBack"></div>
+    </div>
+  </div>
+  <div class="nav-btns">
+    <button onclick="prevCard()">← Prev</button>
+    <button onclick="nextCard()">Next →</button>
+  </div>
+</div>
+
 <script>
-  // --- Navigation ---
+  let currentFolder = '';
+  let currentCards = [];
+  let currentIndex = 0;
+
   function showCreate() {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('create-screen').classList.add('active');
@@ -209,7 +305,6 @@ Molecule - Two or more atoms bonded"></textarea>
     loadFolders();
   }
 
-  // --- Data Handling ---
   function getData() {
     return JSON.parse(localStorage.getItem('flashcardFolders') || '{}');
   }
@@ -252,7 +347,7 @@ Molecule - Two or more atoms bonded"></textarea>
     });
 
     setData(data);
-    alert(`Added ${lines.length} flashcards to folder "${folderName}"`);
+    alert(`Added flashcards to folder "${folderName}"`);
     document.getElementById('bulkInput').value = '';
   }
 
@@ -270,8 +365,52 @@ Molecule - Two or more atoms bonded"></textarea>
       const div = document.createElement('div');
       div.className = 'folder';
       div.innerHTML = `<span class="folder-icon">📁</span>${name}<br><small>${data[name].length} cards</small>`;
+      div.onclick = () => openFolder(name);
       folderList.appendChild(div);
     });
+  }
+
+  function openFolder(name) {
+    currentFolder = name;
+    currentCards = getData()[name] || [];
+    currentIndex = 0;
+    showFlashcards();
+  }
+
+  function showFlashcards() {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('flashcard-screen').classList.add('active');
+    document.getElementById('folderTitle').textContent = currentFolder;
+    updateCard();
+  }
+
+  function updateCard() {
+    if (currentCards.length === 0) {
+      document.getElementById('cardFront').textContent = 'No cards yet';
+      document.getElementById('cardBack').textContent = '';
+      return;
+    }
+    const card = currentCards[currentIndex];
+    document.getElementById('cardFront').textContent = card.term;
+    document.getElementById('cardBack').textContent = card.def;
+  }
+
+  function flipCard() {
+    document.querySelector('.flashcard').classList.toggle('flip');
+  }
+
+  function nextCard() {
+    if (currentCards.length === 0) return;
+    currentIndex = (currentIndex + 1) % currentCards.length;
+    document.querySelector('.flashcard').classList.remove('flip');
+    updateCard();
+  }
+
+  function prevCard() {
+    if (currentCards.length === 0) return;
+    currentIndex = (currentIndex - 1 + currentCards.length) % currentCards.length;
+    document.querySelector('.flashcard').classList.remove('flip');
+    updateCard();
   }
 
   loadFolders();
