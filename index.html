@@ -71,11 +71,31 @@
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+    flex-direction: column;
     overflow-y: auto;
-    align-items: flex-start;
     position: relative;
+  }
+
+  /* Floating button */
+  .add-btn {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: rgba(0, 122, 255, 0.85);
+    color: white;
+    border: none;
+    font-size: 32px;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+  }
+
+  .add-btn:hover {
+    background: rgba(0, 122, 255, 1);
+    transform: scale(1.05);
   }
 
   /* Folder cards */
@@ -90,17 +110,12 @@
     justify-content: center;
     font-weight: 500;
     color: #333;
-    user-select: none;
+    margin: 10px;
+    cursor: pointer;
+    transition: 0.2s;
     animation: fadeInUp 0.6s ease forwards;
     opacity: 0;
     transform: translateY(20px);
-  }
-
-  @keyframes fadeInUp {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
   }
 
   .folder:hover {
@@ -108,37 +123,46 @@
     transform: scale(1.03);
   }
 
-  .none {
-    font-size: 1.2rem;
-    color: rgba(0, 0, 0, 0.4);
-    animation: fadeIn 1s ease forwards;
-    opacity: 0;
+  @keyframes fadeInUp {
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  @keyframes fadeIn {
-    to {
-      opacity: 1;
-    }
-  }
-
-  /* Page headers */
-  .page-title {
-    position: absolute;
-    top: 20px;
-    left: 30px;
-    font-size: 1.5rem;
-    font-weight: 600;
-    opacity: 0.9;
-  }
-
-  /* Content fade */
-  .content {
-    width: 100%;
-    margin-top: 60px;
+  .folder-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
-    justify-content: flex-start;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+
+  .flashcard {
+    width: 250px;
+    height: 150px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 10px;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+
+  .flashcard:hover {
+    transform: scale(1.05);
+  }
+
+  .currency {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: rgba(0,0,0,0.7);
   }
 
 </style>
@@ -149,83 +173,128 @@
     <div class="nav-top">
       <div class="nav-item active" data-page="home">🏠 Home</div>
       <div class="nav-item" data-page="profile">👤 Profile</div>
-      <div class="nav-item" data-page="settings">⚙️ Settings</div>
-      <div class="nav-item" data-page="about">ℹ️ About</div>
+      <div class="nav-item" data-page="game">🏀 Basketball Mode</div>
     </div>
 
-    <div class="nav-bottom">
-      Logged in as: <strong>Finley</strong>
-    </div>
+    <div class="nav-bottom" id="username-display"></div>
   </div>
 
-  <div class="main" id="main"></div>
+  <div class="main" id="main">
+    <div class="currency">💰 Coins: <span id="coins">0</span></div>
+    <button class="add-btn" id="addBtn">+</button>
+  </div>
 
   <script>
-    const main = document.getElementById('main');
-    const navItems = document.querySelectorAll('.nav-item');
+    const main = document.getElementById("main");
+    const addBtn = document.getElementById("addBtn");
+    const usernameDisplay = document.getElementById("username-display");
+    const navItems = document.querySelectorAll(".nav-item");
+    const coinsDisplay = document.getElementById("coins");
 
-    const folders = ['History', 'Science', 'Spanish', 'Basketball Facts'];
+    // Load or ask for username
+    let username = localStorage.getItem("username");
+    if (!username) {
+      username = prompt("Enter your name:");
+      if (username) localStorage.setItem("username", username);
+    }
+    usernameDisplay.textContent = username ? `Logged in as: ${username}` : "Not logged in";
+
+    let coins = 0;
+    let folders = JSON.parse(localStorage.getItem("folders") || "[]");
+
+    function saveFolders() {
+      localStorage.setItem("folders", JSON.stringify(folders));
+    }
 
     function renderHome() {
-      main.innerHTML = `<div class='page-title'>Your Folders</div><div class='content' id='folder-container'></div>`;
-      const container = document.getElementById('folder-container');
-      if (folders.length === 0) {
-        const msg = document.createElement('div');
-        msg.classList.add('none');
-        msg.textContent = 'None';
-        container.appendChild(msg);
-      } else {
-        folders.forEach((name, i) => {
-          const div = document.createElement('div');
-          div.classList.add('folder');
-          div.textContent = name;
-          div.style.animationDelay = `${i * 0.08}s`;
-          container.appendChild(div);
+      main.innerHTML = `
+        <div class="currency">💰 Coins: <span id="coins">${coins}</span></div>
+        <button class="add-btn" id="addBtn">+</button>
+        <div class="page-title">Your Folders</div>
+        <div class="folder-container" id="folder-container"></div>
+      `;
+      const container = document.getElementById("folder-container");
+      folders.forEach((folder, i) => {
+        const div = document.createElement("div");
+        div.classList.add("folder");
+        div.textContent = folder.name;
+        div.style.animationDelay = `${i * 0.1}s`;
+        div.addEventListener("click", () => openFolder(i));
+        container.appendChild(div);
+      });
+      document.getElementById("addBtn").addEventListener("click", createFolder);
+    }
+
+    function createFolder() {
+      const name = prompt("Enter folder name:");
+      if (name) {
+        folders.push({ name, flashcards: [] });
+        saveFolders();
+        renderHome();
+      }
+    }
+
+    function openFolder(index) {
+      const folder = folders[index];
+      main.innerHTML = `
+        <div class="page-title">${folder.name}</div>
+        <div class="currency">💰 Coins: <span id="coins">${coins}</span></div>
+        <button class="add-btn" id="addBtn">+</button>
+        <div class="folder-container" id="flashcard-container"></div>
+      `;
+      const container = document.getElementById("flashcard-container");
+      folder.flashcards.forEach((card, i) => {
+        const div = document.createElement("div");
+        div.classList.add("flashcard");
+        div.textContent = card.front;
+        div.addEventListener("click", () => {
+          if (div.textContent === card.front) {
+            div.textContent = card.back;
+          } else {
+            div.textContent = card.front;
+          }
         });
+        container.appendChild(div);
+      });
+      document.getElementById("addBtn").addEventListener("click", () => createFlashcard(index));
+    }
+
+    function createFlashcard(index) {
+      const front = prompt("Front of flashcard:");
+      const back = prompt("Back of flashcard:");
+      if (front && back) {
+        folders[index].flashcards.push({ front, back });
+        saveFolders();
+        openFolder(index);
       }
     }
 
     function renderProfile() {
       main.innerHTML = `
-        <div class='page-title'>Profile</div>
-        <div class='content'><div class='none'>Profile editing coming soon!</div></div>
+        <div class="page-title">Profile</div>
+        <div style="margin-top: 20px;">Hello, ${username}! You have ${coins} coins.</div>
       `;
     }
 
-    function renderSettings() {
+    function renderGame() {
       main.innerHTML = `
-        <div class='page-title'>Settings</div>
-        <div class='content'><div class='none'>Customize Steph Study in future updates.</div></div>
+        <div class="page-title">🏀 Basketball Mode</div>
+        <div style="margin-top: 40px;">Game mode coming soon: play and answer multiple-choice questions!</div>
       `;
-    }
-
-    function renderAbout() {
-      main.innerHTML = `
-        <div class='page-title'>About</div>
-        <div class='content'><div class='none'>Steph Study: Learn, Play, Dominate 🏀</div></div>
-      `;
-    }
-
-    function setActive(page) {
-      navItems.forEach(item => {
-        item.classList.toggle('active', item.dataset.page === page);
-      });
     }
 
     navItems.forEach(item => {
-      item.addEventListener('click', () => {
-        const page = item.dataset.page;
-        setActive(page);
-        switch (page) {
-          case 'home': renderHome(); break;
-          case 'profile': renderProfile(); break;
-          case 'settings': renderSettings(); break;
-          case 'about': renderAbout(); break;
+      item.addEventListener("click", () => {
+        navItems.forEach(i => i.classList.remove("active"));
+        item.classList.add("active");
+        switch (item.dataset.page) {
+          case "home": renderHome(); break;
+          case "profile": renderProfile(); break;
+          case "game": renderGame(); break;
         }
       });
     });
 
-    // Load default page
     renderHome();
   </script>
 
