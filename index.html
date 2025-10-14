@@ -1,48 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Steph Study 🏀</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Steph Study</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>Steph Study 🏀</h1>
-    <div class="mode-buttons">
-      <button onclick="setMode('flashcards')">Flashcards</button>
-      <button onclick="setMode('sorting')">Sorting</button>
-      <button onclick="setMode('test')">Test</button>
-      <button onclick="setMode('game')">Game</button>
+  <div class="navbar">
+    <div class="logo">Steph Study 🏀</div>
+    <div class="nav-items">
+      <button onclick="toggleBasketballMode()" id="gameModeBtn">🎮 Basketball Mode</button>
+      <button onclick="googleSignIn()">Sign in with Google</button>
+      <button onclick="exportData()">Export</button>
+      <button onclick="importModal()">Import</button>
     </div>
-  </header>
+  </div>
 
-  <main id="main-content">
-    <section id="folder-section">
-      <h2>Folders</h2>
-      <div id="folders"></div>
-      <button id="create-folder-btn" onclick="createFolder()">+ Create Folder</button>
-    </section>
-
-    <section id="flashcard-section" class="hidden">
-      <h2 id="folder-name"></h2>
-      <div id="flashcards-container"></div>
-      <div class="flashcard-buttons">
-        <button onclick="addFlashcard()">+ Add Flashcard</button>
-        <button onclick="goBack()">← Back to Folders</button>
+  <div class="container">
+    <aside class="sidebar">
+      <button class="btn" onclick="openCreateFolder()">+ New Folder</button>
+      <div id="folderList" class="folder-list"></div>
+    </aside>
+    <main class="main">
+      <div id="folderView" class="folder-view hidden">
+        <div class="folder-header">
+          <h2 id="folderTitle">Folder Name</h2>
+          <div class="folder-actions">
+            <button onclick="openRenameFolder()">Rename</button>
+            <button onclick="deleteFolder()">Delete</button>
+          </div>
+        </div>
+        <div class="folder-controls">
+          <button onclick="openAddCard()">+ Add Card</button>
+          <button onclick="openBulkAdd()">Bulk Add</button>
+          <button onclick="startMode('flashcard')">Study</button>
+          <button onclick="startMode('sorting')">Sort</button>
+          <button onclick="startMode('test')">Test</button>
+          <button onclick="startMode('game')" id="gameButton">Game</button>
+        </div>
+        <div id="cardList" class="card-list"></div>
       </div>
-    </section>
 
-    <section id="game-section" class="hidden">
-      <div id="game-timer">10</div>
-      <iframe id="game-frame" src="https://basketbros.bitbucket.io" allowfullscreen></iframe>
-      <div id="question-popup" class="hidden">
-        <h2 id="game-question"></h2>
-        <input id="game-answer" placeholder="Type your answer...">
-        <button onclick="checkGameAnswer()">Submit</button>
+      <div id="studyView" class="study-view hidden">
+        <div class="study-header">
+          <h2 id="studyFolderName">Folder</h2>
+          <button onclick="endStudy()">← Back</button>
+        </div>
+        <div class="card-flip" onclick="flipCard()" id="flipCard">
+          <div class="card-inner" id="cardInner">
+            <div class="card-front" id="cardFront"></div>
+            <div class="card-back" id="cardBack"></div>
+          </div>
+        </div>
+        <div class="study-controls">
+          <button onclick="markKnow()">Know</button>
+          <button onclick="markDont()">Don't Know</button>
+        </div>
       </div>
-    </section>
-  </main>
+
+      <div id="testView" class="test-view hidden">
+        <div class="test-header">
+          <h2 id="testFolderName">Test</h2>
+          <button onclick="endTest()">← Back</button>
+        </div>
+        <div class="test-question" id="testQuestion"></div>
+        <div class="test-options" id="testOptions"></div>
+      </div>
+
+      <div id="gameView" class="game-view hidden">
+        <div class="game-header">
+          <h2>Basketball Mode: <span id="gameFolderName"></span></h2>
+          <button onclick="endGame()">← Back</button>
+        </div>
+        <div class="game-timer" id="gameTimer">10s</div>
+        <iframe id="gameIframe" src="https://basketbros.bitbucket.io" class="game-frame"></iframe>
+        <div id="gameBlocker" class="game-blocker"></div>
+        <div id="gameQuestionArea" class="game-question-area hidden"></div>
+      </div>
+    </main>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-content" id="modalContent"></div>
+  </div>
 
   <script src="script.js"></script>
 </body>
