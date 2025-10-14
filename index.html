@@ -1,302 +1,556 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Steph Study</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Steph Study — Fixed</title>
 <style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  :root{
+    --glass-bg: rgba(255,255,255,0.08);
+    --accent: rgba(255,255,224,0.3); /* soft yellow */
+    --blue: #007aff;
+    --text: #1c1c1e;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial;
+    background: linear-gradient(135deg,#fdfcf7 0%,#f8f8f4 100%);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
   }
 
-  body {
-    height: 100vh;
-    display: flex;
-    background: linear-gradient(135deg, #fdfcf7 0%, #f8f8f4 100%);
-    color: #1c1c1e;
-    overflow: hidden;
+  /* Left nav (persistent) */
+  .sidebar{
+    width:260px;
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    background: var(--glass-bg);
+    border-right:1px solid rgba(255,255,255,0.18);
+  }
+  .nav {
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .nav .item {
+    padding:10px 14px;
+    border-radius:10px;
+    background: rgba(255,255,224,0.12);
+    cursor:pointer;
+    user-select:none;
+    transition: all .18s ease;
+  }
+  .nav .item:hover { transform: translateX(4px); background: rgba(255,255,224,0.22); }
+  .nav .item.active { background: rgba(255,255,224,0.36); font-weight:600; }
+
+  .meta { font-size:13px; color:rgba(0,0,0,0.65) }
+
+  /* content area - this is re-rendered safely */
+  .content-wrap{
+    flex:1;
+    padding:28px;
+    position:relative;
+    overflow:auto;
+    backdrop-filter: blur(16px);
+    background: rgba(255,255,255,0.06);
   }
 
-  /* Sidebar */
-  .sidebar {
-    width: 260px;
-    backdrop-filter: blur(25px) saturate(180%);
-    -webkit-backdrop-filter: blur(25px) saturate(180%);
-    background-color: rgba(255, 255, 255, 0.08);
-    border-right: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: inset -1px 0 0 rgba(255,255,255,0.2);
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
+  .page-title{ font-size:20px; font-weight:700; margin-bottom:12px; }
+  .folder-grid{ display:flex; flex-wrap:wrap; gap:18px; }
 
-  .nav-top {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+  .folder{
+    width:180px; height:140px; border-radius:14px;
+    background: var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    cursor:pointer; transition:transform .18s, background .18s; user-select:none;
+    opacity:0; transform:translateY(12px);
+    animation: fadein .5s forwards;
   }
+  .folder:hover{ transform:translateY( -3px ); background: rgba(255,255,224,0.4); }
+  @keyframes fadein { to { opacity:1; transform:none } }
 
-  .nav-item {
-    padding: 10px 16px;
-    border-radius: 12px;
-    background: rgba(255, 255, 224, 0.15);
-    cursor: pointer;
-    transition: all 0.25s ease;
-  }
+  /* flashcards in folder */
+  .flashcards-row{ display:flex; flex-wrap:wrap; gap:12px; margin-top:10px; }
+  .card{ width:240px; height:150px; background:rgba(255,255,255,0.9); border-radius:12px; box-shadow:0 8px 22px rgba(0,0,0,0.06); display:flex; align-items:center; justify-content:center; text-align:center; padding:10px; cursor:pointer; }
+  .card:hover{ transform:translateY(-6px) }
 
-  .nav-item:hover {
-    background: rgba(255, 255, 224, 0.3);
-    transform: translateX(3px);
-  }
-
-  .nav-item.active {
-    background: rgba(255, 255, 224, 0.4);
-    font-weight: 600;
-  }
-
-  .nav-bottom {
-    font-size: 0.9rem;
-    opacity: 0.7;
-  }
-
-  /* Main area */
-  .main {
-    flex: 1;
-    padding: 40px;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    position: relative;
-  }
-
-  /* Floating button */
-  .add-btn {
-    position: absolute;
-    bottom: 30px;
+  /* persistent floating create button (outside re-render area) */
+  .floating-create{
+    position: fixed;
     right: 30px;
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
-    background: rgba(0, 122, 255, 0.85);
-    color: white;
-    border: none;
-    font-size: 32px;
-    cursor: pointer;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-    transition: all 0.3s ease;
+    bottom: 28px;
+    width:68px; height:68px; border-radius:50%;
+    background: linear-gradient(180deg,#1078ff,#0066e0);
+    color:white; font-size:36px; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 12px 36px rgba(0,0,0,0.18); cursor:pointer; border:none;
+  }
+  .floating-create:hover{ transform:scale(1.04) }
+
+  /* small controls */
+  .controls-row{ display:flex; gap:10px; margin-bottom:10px; }
+  .btn { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
+  .btn.ghost { background:transparent; border:1px solid rgba(0,0,0,0.07) }
+  .btn.primary { background:var(--blue); color:white }
+
+  /* coins display top-right inside content */
+  .coins {
+    position:absolute; right:28px; top:18px; font-weight:700; color:rgba(0,0,0,0.7)
   }
 
-  .add-btn:hover {
-    background: rgba(0, 122, 255, 1);
-    transform: scale(1.05);
-  }
+  /* modal */
+  .modal-veil{ position:fixed; inset:0; display:none; place-items:center; background:rgba(6,12,24,0.36); z-index:999; }
+  .modal-veil.open{ display:grid; }
+  .modal-box{ width:420px; background:white; border-radius:12px; padding:16px; box-shadow:0 30px 80px rgba(0,0,0,0.25); }
 
-  /* Folder cards */
-  .folder {
-    width: 180px;
-    height: 150px;
-    border-radius: 16px;
-    background: rgba(255, 255, 224, 0.3);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 500;
-    color: #333;
-    margin: 10px;
-    cursor: pointer;
-    transition: 0.2s;
-    animation: fadeInUp 0.6s ease forwards;
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  .folder:hover {
-    background: rgba(255, 255, 224, 0.4);
-    transform: scale(1.03);
-  }
-
-  @keyframes fadeInUp {
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .folder-container {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  .page-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 15px;
-  }
-
-  .flashcard {
-    width: 250px;
-    height: 150px;
-    background: rgba(255,255,255,0.6);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    margin: 10px;
-    cursor: pointer;
-    transition: transform 0.3s;
-  }
-
-  .flashcard:hover {
-    transform: scale(1.05);
-  }
-
-  .currency {
-    position: absolute;
-    top: 20px;
-    right: 40px;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: rgba(0,0,0,0.7);
-  }
-
+  input[type="text"], textarea { width:100%; padding:10px; border-radius:8px; border:1px solid #e6e9f2; margin-top:8px; font-size:14px }
+  textarea { min-height:100px; resize:vertical }
+  .row { display:flex; gap:8px; align-items:center }
+  .muted { color:rgba(0,0,0,0.55); font-size:13px }
 </style>
 </head>
 <body>
-
-  <div class="sidebar">
-    <div class="nav-top">
-      <div class="nav-item active" data-page="home">🏠 Home</div>
-      <div class="nav-item" data-page="profile">👤 Profile</div>
-      <div class="nav-item" data-page="game">🏀 Basketball Mode</div>
+  <!-- Left navigation (persistent) -->
+  <aside class="sidebar" id="sidebar">
+    <div>
+      <div style="font-weight:800; font-size:18px; margin-bottom:8px">Steph Study 🏀</div>
+      <div class="nav" id="nav">
+        <div class="item active" data-page="home">Home</div>
+        <div class="item" data-page="profile">Profile</div>
+        <div class="item" data-page="basketball">Basketball Mode</div>
+      </div>
     </div>
 
-    <div class="nav-bottom" id="username-display"></div>
+    <div>
+      <div class="muted">Logged in as</div>
+      <div id="usernameDisplay" style="font-weight:700; margin-top:6px"></div>
+    </div>
+  </aside>
+
+  <!-- Right content area (we re-render this safely) -->
+  <main class="content-wrap" id="content">
+    <!-- content injected here -->
+    <!-- coins display (inside content so it scrolls with area) -->
+    <div class="coins" id="coinsDisplay">💰 0</div>
+  </main>
+
+  <!-- Floating create button (persistent) -->
+  <button id="floatingCreate" class="floating-create" title="Create">+</button>
+
+  <!-- Modal (persistent) -->
+  <div id="modal" class="modal-veil" role="dialog" aria-modal="true">
+    <div class="modal-box" id="modalBox"></div>
   </div>
 
-  <div class="main" id="main">
-    <div class="currency">💰 Coins: <span id="coins">0</span></div>
-    <button class="add-btn" id="addBtn">+</button>
-  </div>
+<script>
+/* ---------------------------
+   App state & persistence
+   --------------------------- */
+const STORAGE_KEY = 'steph_v2_data';
+let store = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+if (!store.folders) store.folders = []; // { name, cards: [{id,front,back}], createdAt }
+if (!store.coins) store.coins = 0;
 
-  <script>
-    const main = document.getElementById("main");
-    const addBtn = document.getElementById("addBtn");
-    const usernameDisplay = document.getElementById("username-display");
-    const navItems = document.querySelectorAll(".nav-item");
-    const coinsDisplay = document.getElementById("coins");
+/* username */
+let username = localStorage.getItem('steph_name') || '';
+if (!username) {
+  username = prompt('What is your name?') || '';
+  if (username) localStorage.setItem('steph_name', username);
+}
+document.getElementById('usernameDisplay').textContent = username || 'Guest';
 
-    // Load or ask for username
-    let username = localStorage.getItem("username");
-    if (!username) {
-      username = prompt("Enter your name:");
-      if (username) localStorage.setItem("username", username);
-    }
-    usernameDisplay.textContent = username ? `Logged in as: ${username}` : "Not logged in";
+/* helpers */
+function saveStore(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(store)); updateCoinsUI(); }
+function uid(){ return Math.random().toString(36).slice(2,9) }
+function $(id){ return document.getElementById(id) }
 
-    let coins = 0;
-    let folders = JSON.parse(localStorage.getItem("folders") || "[]");
+/* persistent elements (do not re-create when rendering content) */
+const navEl = document.getElementById('nav');
+const floatingCreate = document.getElementById('floatingCreate');
+const modal = document.getElementById('modal');
+const modalBox = document.getElementById('modalBox');
+const content = document.getElementById('content');
+const coinsDisplay = document.getElementById('coinsDisplay');
 
-    function saveFolders() {
-      localStorage.setItem("folders", JSON.stringify(folders));
-    }
+/* ---------------------------
+   Wire persistent controls
+   --------------------------- */
+/* Nav click handling using delegation */
+navEl.addEventListener('click', e=>{
+  const item = e.target.closest('.item');
+  if(!item) return;
+  // set active
+  navEl.querySelectorAll('.item').forEach(i=>i.classList.remove('active'));
+  item.classList.add('active');
+  const page = item.dataset.page;
+  if (page === 'home') renderHome();
+  if (page === 'profile') renderProfile();
+  if (page === 'basketball') renderBasketball();
+});
 
-    function renderHome() {
-      main.innerHTML = `
-        <div class="currency">💰 Coins: <span id="coins">${coins}</span></div>
-        <button class="add-btn" id="addBtn">+</button>
-        <div class="page-title">Your Folders</div>
-        <div class="folder-container" id="folder-container"></div>
-      `;
-      const container = document.getElementById("folder-container");
-      folders.forEach((folder, i) => {
-        const div = document.createElement("div");
-        div.classList.add("folder");
-        div.textContent = folder.name;
-        div.style.animationDelay = `${i * 0.1}s`;
-        div.addEventListener("click", () => openFolder(i));
-        container.appendChild(div);
-      });
-      document.getElementById("addBtn").addEventListener("click", createFolder);
-    }
+/* Floating create: open create-folder modal when on home, else create card when inside folder */
+floatingCreate.addEventListener('click', ()=>{
+  const active = navEl.querySelector('.item.active');
+  const page = active ? active.dataset.page : 'home';
+  if (page === 'home') openCreateFolderModal();
+  else if (page === 'profile') alert('Profile creation coming soon');
+  else if (page === 'basketball') openCreateFolderModal();
+});
 
-    function createFolder() {
-      const name = prompt("Enter folder name:");
-      if (name) {
-        folders.push({ name, flashcards: [] });
-        saveFolders();
-        renderHome();
-      }
-    }
+/* Modal helpers */
+function openModal(html){
+  modalBox.innerHTML = html;
+  modal.classList.add('open');
+}
+function closeModal(){ modal.classList.remove('open'); modalBox.innerHTML=''; }
+modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
 
-    function openFolder(index) {
-      const folder = folders[index];
-      main.innerHTML = `
-        <div class="page-title">${folder.name}</div>
-        <div class="currency">💰 Coins: <span id="coins">${coins}</span></div>
-        <button class="add-btn" id="addBtn">+</button>
-        <div class="folder-container" id="flashcard-container"></div>
-      `;
-      const container = document.getElementById("flashcard-container");
-      folder.flashcards.forEach((card, i) => {
-        const div = document.createElement("div");
-        div.classList.add("flashcard");
-        div.textContent = card.front;
-        div.addEventListener("click", () => {
-          if (div.textContent === card.front) {
-            div.textContent = card.back;
-          } else {
-            div.textContent = card.front;
-          }
-        });
-        container.appendChild(div);
-      });
-      document.getElementById("addBtn").addEventListener("click", () => createFlashcard(index));
-    }
+/* coins UI */
+function updateCoinsUI(){
+  coinsDisplay.textContent = '💰 ' + (store.coins || 0);
+}
+updateCoinsUI();
 
-    function createFlashcard(index) {
-      const front = prompt("Front of flashcard:");
-      const back = prompt("Back of flashcard:");
-      if (front && back) {
-        folders[index].flashcards.push({ front, back });
-        saveFolders();
-        openFolder(index);
-      }
-    }
+/* ---------------------------
+   Render views (only update content area)
+   --------------------------- */
 
-    function renderProfile() {
-      main.innerHTML = `
-        <div class="page-title">Profile</div>
-        <div style="margin-top: 20px;">Hello, ${username}! You have ${coins} coins.</div>
-      `;
-    }
+function renderHome(){
+  // content header + folder grid
+  content.innerHTML = `
+    <div class="page-title">Your Folders</div>
+    <div class="controls-row muted">Create folders with the + button</div>
+    <div class="folder-grid" id="folderGrid"></div>
+    <div style="margin-top:18px; color:rgba(0,0,0,0.5)">Tip: click a folder to open it.</div>
+  `;
+  // fill folder grid
+  const grid = document.getElementById('folderGrid');
+  if (!store.folders.length){
+    const none = document.createElement('div');
+    none.className = 'muted';
+    none.style.marginTop = '20px';
+    none.textContent = 'None';
+    grid.appendChild(none);
+    return;
+  }
+  store.folders.forEach((f, i) => {
+    const el = document.createElement('div');
+    el.className = 'folder';
+    el.textContent = f.name;
+    el.style.animationDelay = `${i * 0.06}s`;
+    el.dataset.index = i;
+    el.addEventListener('click', ()=> openFolder(i));
+    grid.appendChild(el);
+  });
+}
 
-    function renderGame() {
-      main.innerHTML = `
-        <div class="page-title">🏀 Basketball Mode</div>
-        <div style="margin-top: 40px;">Game mode coming soon: play and answer multiple-choice questions!</div>
-      `;
-    }
+function renderProfile(){
+  content.innerHTML = `
+    <div class="page-title">Profile</div>
+    <div class="controls-row">
+      <div class="muted">Name</div>
+    </div>
+    <div style="margin-top:8px; font-weight:700">${username || 'Guest'}</div>
+    <div style="margin-top:18px">
+      <button class="btn ghost" id="changeNameBtn">Change name</button>
+      <button class="btn ghost" id="exportBtn">Export JSON</button>
+      <button class="btn ghost" id="importBtn">Import JSON</button>
+    </div>
+    <div style="margin-top:16px" class="muted">Coins: ${store.coins || 0}</div>
+  `;
+  // wire buttons
+  document.getElementById('changeNameBtn').addEventListener('click', changeName);
+  document.getElementById('exportBtn').addEventListener('click', exportJSON);
+  document.getElementById('importBtn').addEventListener('click', importJSONModal);
+}
 
-    navItems.forEach(item => {
-      item.addEventListener("click", () => {
-        navItems.forEach(i => i.classList.remove("active"));
-        item.classList.add("active");
-        switch (item.dataset.page) {
-          case "home": renderHome(); break;
-          case "profile": renderProfile(); break;
-          case "game": renderGame(); break;
-        }
-      });
-    });
+function renderBasketball(){
+  content.innerHTML = `
+    <div class="page-title">Basketball Mode</div>
+    <div style="margin-top:12px" class="muted">Play for 10s, then answer a multiple choice question. Correct = +10s.</div>
+    <div style="margin-top:18px; color:rgba(0,0,0,0.55)">Game embedding will be added soon. For now this placeholder runs the question flow with a simulated timer.</div>
+    <div style="margin-top:18px">
+      <button class="btn primary" id="startSim">Start Simulated Challenge</button>
+    </div>
+    <div id="basketArea" style="margin-top:18px"></div>
+  `;
+  document.getElementById('startSim').addEventListener('click', startSimulatedGame);
+}
 
+/* ---------------------------
+   Folder operations
+   --------------------------- */
+
+function openCreateFolderModal(){
+  openModal(`
+    <h3>Create Folder</h3>
+    <div class="muted">Folder name</div>
+    <input id="newFolderName" type="text" placeholder="e.g. Biology" />
+    <div style="margin-top:10px; display:flex; gap:8px; justify-content:flex-end">
+      <button class="btn ghost" id="cancelCreate">Cancel</button>
+      <button class="btn primary" id="confirmCreate">Create</button>
+    </div>
+  `);
+  document.getElementById('cancelCreate').addEventListener('click', closeModal);
+  document.getElementById('confirmCreate').addEventListener('click', ()=>{
+    const name = document.getElementById('newFolderName').value.trim();
+    if(!name) return alert('Enter a folder name');
+    store.folders.push({ name, cards: [] });
+    saveStore();
+    closeModal();
     renderHome();
-  </script>
+  });
+}
 
+function openFolder(idx){
+  const folder = store.folders[idx];
+  content.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center">
+      <div>
+        <div class="page-title">${folder.name}</div>
+        <div class="muted">${folder.cards.length} cards</div>
+      </div>
+      <div>
+        <button class="btn ghost" id="backBtn">Back</button>
+        <button class="btn ghost" id="renameFolderBtn">Rename</button>
+        <button class="btn ghost" id="deleteFolderBtn">Delete</button>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn primary" id="addCardBtn">+ Add Card</button>
+    </div>
+    <div class="flashcards-row" id="cardsRow"></div>
+  `;
+  document.getElementById('backBtn').addEventListener('click', renderHome);
+  document.getElementById('renameFolderBtn').addEventListener('click', ()=> openRenameFolderModal(idx));
+  document.getElementById('deleteFolderBtn').addEventListener('click', ()=> {
+    if(!confirm('Delete folder?')) return;
+    store.folders.splice(idx,1); saveStore(); renderHome();
+  });
+  document.getElementById('addCardBtn').addEventListener('click', ()=> openAddCardModal(idx));
+  // render cards
+  const cardsRow = document.getElementById('cardsRow');
+  if(!folder.cards.length){
+    const n = document.createElement('div'); n.className='muted'; n.textContent='No cards yet'; cardsRow.appendChild(n);
+  } else {
+    folder.cards.forEach((c,ci)=>{
+      const cardEl = document.createElement('div');
+      cardEl.className = 'card';
+      cardEl.innerHTML = `<div><div style="font-weight:700">${escape(c.front)}</div><div style="color:rgba(0,0,0,0.6); margin-top:6px">${escape(c.back)}</div></div>`;
+      // simple flip: clicking toggles showing front/back (we show both here for simplicity)
+      // add edit/delete controls on right-click
+      cardEl.addEventListener('contextmenu', (ev)=>{
+        ev.preventDefault();
+        openCardContextMenu(idx, ci, ev.pageX, ev.pageY);
+      });
+      cardsRow.appendChild(cardEl);
+    });
+  }
+}
+
+/* edit and add card modals */
+function openAddCardModal(folderIdx){
+  openModal(`
+    <h3>Add Card</h3>
+    <div class="muted">Front (term)</div>
+    <input id="cardFront" type="text" />
+    <div class="muted" style="margin-top:6px">Back (definition)</div>
+    <textarea id="cardBack"></textarea>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:8px">
+      <button class="btn ghost" id="cancelAddCard">Cancel</button>
+      <button class="btn primary" id="confirmAddCard">Add</button>
+    </div>
+  `);
+  document.getElementById('cancelAddCard').addEventListener('click', closeModal);
+  document.getElementById('confirmAddCard').addEventListener('click', ()=>{
+    const front = document.getElementById('cardFront').value.trim();
+    const back = document.getElementById('cardBack').value.trim();
+    if(!front || !back) return alert('Both front and back required');
+    store.folders[folderIdx].cards.push({ id: uid(), front, back });
+    saveStore(); closeModal(); openFolder(folderIdx);
+  });
+}
+
+function openCardContextMenu(folderIdx, cardIdx, x, y){
+  // simple floating menu using modal for edit/delete
+  openModal(`
+    <h3>Card options</h3>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px">
+      <button class="btn ghost" id="editCardBtn">Edit</button>
+      <button class="btn ghost" id="deleteCardBtn">Delete</button>
+      <button class="btn" id="closeCtx">Close</button>
+    </div>
+  `);
+  document.getElementById('editCardBtn').addEventListener('click', ()=>{
+    closeModal();
+    openEditCardModal(folderIdx, cardIdx);
+  });
+  document.getElementById('deleteCardBtn').addEventListener('click', ()=>{
+    if(!confirm('Delete card?')) return;
+    store.folders[folderIdx].cards.splice(cardIdx,1); saveStore(); closeModal(); openFolder(folderIdx);
+  });
+  document.getElementById('closeCtx').addEventListener('click', closeModal);
+}
+
+function openEditCardModal(folderIdx, cardIdx){
+  const card = store.folders[folderIdx].cards[cardIdx];
+  openModal(`
+    <h3>Edit Card</h3>
+    <div class="muted">Front</div>
+    <input id="editFront" type="text" value="${escape(card.front)}" />
+    <div class="muted" style="margin-top:6px">Back</div>
+    <textarea id="editBack">${escape(card.back)}</textarea>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:8px">
+      <button class="btn ghost" id="cancelEdit">Cancel</button>
+      <button class="btn primary" id="saveEdit">Save</button>
+    </div>
+  `);
+  document.getElementById('cancelEdit').addEventListener('click', closeModal);
+  document.getElementById('saveEdit').addEventListener('click', ()=>{
+    const front = document.getElementById('editFront').value.trim();
+    const back = document.getElementById('editBack').value.trim();
+    if(!front || !back) return alert('Both fields required');
+    store.folders[folderIdx].cards[cardIdx].front = front;
+    store.folders[folderIdx].cards[cardIdx].back = back;
+    saveStore(); closeModal(); openFolder(folderIdx);
+  });
+}
+
+/* rename folder modal */
+function openRenameFolderModal(idx){
+  const f = store.folders[idx];
+  openModal(`
+    <h3>Rename Folder</h3>
+    <input id="renameFld" type="text" value="${escape(f.name)}" />
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:8px">
+      <button class="btn ghost" id="cancelRename">Cancel</button>
+      <button class="btn primary" id="confirmRename">Save</button>
+    </div>
+  `);
+  document.getElementById('cancelRename').addEventListener('click', closeModal);
+  document.getElementById('confirmRename').addEventListener('click', ()=>{
+    const v = document.getElementById('renameFld').value.trim();
+    if(!v) return alert('Enter a name');
+    store.folders[idx].name = v; saveStore(); closeModal(); openFolder(idx);
+  });
+}
+
+/* ---------------------------
+   Basketball simulated challenge (question flow fix)
+   --------------------------- */
+let simGameState = null;
+function startSimulatedGame(){
+  if (!store.folders.length) return alert('Create a folder with flashcards first');
+  // pick a folder that has cards, else show message
+  const folderWithCards = store.folders.findIndex(f => f.cards && f.cards.length);
+  if (folderWithCards === -1) return alert('Add cards to a folder first');
+
+  const area = document.getElementById('basketArea');
+  area.innerHTML = `<div style="padding:12px;background:rgba(255,255,255,0.9);border-radius:10px">Simulated game running — you have <strong id="simTimer">10</strong>s of play. When time ends you must answer a multiple choice question.</div><div id="simQuestion" style="margin-top:12px"></div>`;
+  simGameState = { remaining: 10, interval: null, folderIdx: folderWithCards };
+  // start countdown
+  document.getElementById('simTimer').textContent = simGameState.remaining;
+  simGameState.interval = setInterval(()=>{
+    simGameState.remaining--;
+    document.getElementById('simTimer').textContent = simGameState.remaining;
+    if(simGameState.remaining <= 0){
+      clearInterval(simGameState.interval);
+      simGameState.interval = null;
+      presentSimQuestion();
+    }
+  }, 1000);
+}
+
+function presentSimQuestion(){
+  // disable "game" (simulated) and show multiple choice
+  const folder = store.folders[simGameState.folderIdx];
+  const q = folder.cards[Math.floor(Math.random()*folder.cards.length)];
+  // distractors
+  const others = folder.cards.filter(c => c.id !== q.id);
+  const distractors = shuffle(others).slice(0,3).map(c=>c.back);
+  const options = shuffle([q.back, ...distractors]);
+  const el = document.getElementById('simQuestion');
+  el.innerHTML = `<div style="background:white;padding:12px;border-radius:10px">
+    <div style="font-weight:700">What is the definition of "<span>${escape(q.front)}</span>"?</div>
+    <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px">
+      ${options.map((opt,i)=>`<button class="btn ghost" onclick="handleSimAnswer('${encodeURIComponent(opt)}','${encodeURIComponent(q.back)}')">${escape(opt)}</button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function handleSimAnswer(encSelected, encCorrect){
+  const selected = decodeURIComponent(encSelected);
+  const correct = decodeURIComponent(encCorrect);
+  if (selected === correct){
+    // success: +10s and continue
+    alert('Correct — you earned +10s and continue playing!');
+    simGameState.remaining = 10;
+    document.getElementById('simTimer').textContent = simGameState.remaining;
+    document.getElementById('simQuestion').innerHTML = '';
+    simGameState.interval = setInterval(()=>{
+      simGameState.remaining--;
+      document.getElementById('simTimer').textContent = simGameState.remaining;
+      if(simGameState.remaining <= 0){
+        clearInterval(simGameState.interval); simGameState.interval=null; presentSimQuestion();
+      }
+    }, 1000);
+  } else {
+    alert('Wrong — game over. Study and try again.');
+    simGameState = null;
+    document.getElementById('basketArea').innerHTML = '';
+  }
+}
+
+/* ---------------------------
+   Import / Export JSON (profile buttons)
+   --------------------------- */
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(store, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'steph-backup.json'; a.click(); URL.revokeObjectURL(url);
+}
+function importJSONModal(){
+  openModal(`<h3>Import JSON</h3><input type="file" id="importFile" accept="application/json" /><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button class="btn ghost" id="cancelImp">Cancel</button><button class="btn primary" id="doImp">Import</button></div>`);
+  document.getElementById('cancelImp').addEventListener('click', closeModal);
+  document.getElementById('doImp').addEventListener('click', ()=>{
+    const file = document.getElementById('importFile').files[0];
+    if(!file) return alert('Choose a file');
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      try {
+        const obj = JSON.parse(e.target.result);
+        store = obj; saveStore(); closeModal(); renderHome();
+        alert('Imported successfully');
+      } catch(err){ alert('Invalid JSON'); }
+    };
+    reader.readAsText(file);
+  });
+}
+
+/* change name */
+function changeName(){
+  const v = prompt('Enter your name', username || '');
+  if(v !== null){ username = v.trim(); localStorage.setItem('steph_name', username); document.getElementById('usernameDisplay').textContent = username || 'Guest'; }
+}
+
+/* ---------------------------
+   Utilities
+   --------------------------- */
+function escape(s){ return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
+function shuffle(arr){ const copy = arr.slice(); for(let i=copy.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [copy[i],copy[j]]=[copy[j],copy[i]] } return copy }
+
+/* ---------------------------
+   Init: render home
+   --------------------------- */
+renderHome();
+
+</script>
 </body>
 </html>
