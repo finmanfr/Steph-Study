@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Liquid Glass UI</title>
+<title>Steph Study</title>
 <style>
   * {
     margin: 0;
@@ -14,20 +14,21 @@
 
   body {
     height: 100vh;
-    background: linear-gradient(135deg, #e0e0e0 0%, #f4f4f4 100%);
     display: flex;
+    background: linear-gradient(135deg, #fdfcf7 0%, #f8f8f4 100%);
     color: #1c1c1e;
+    overflow: hidden;
   }
 
-  /* Left navigation bar */
+  /* Sidebar */
   .sidebar {
     width: 260px;
-    backdrop-filter: blur(18px) saturate(180%);
-    -webkit-backdrop-filter: blur(18px) saturate(180%);
-    background-color: rgba(255, 255, 255, 0.35);
-    border-right: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    background-color: rgba(255, 255, 255, 0.08);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: inset -1px 0 0 rgba(255,255,255,0.2);
-    padding: 20px;
+    padding: 24px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -36,101 +37,196 @@
   .nav-top {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 14px;
   }
 
   .nav-item {
-    padding: 10px 15px;
+    padding: 10px 16px;
     border-radius: 12px;
-    transition: all 0.2s ease;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 224, 0.15);
+    cursor: pointer;
+    transition: all 0.25s ease;
   }
 
   .nav-item:hover {
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 224, 0.3);
+    transform: translateX(3px);
   }
 
   .nav-item.active {
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 224, 0.4);
     font-weight: 600;
   }
 
-  /* Main content area */
+  .nav-bottom {
+    font-size: 0.9rem;
+    opacity: 0.7;
+  }
+
+  /* Main area */
   .main {
     flex: 1;
     padding: 40px;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
     overflow-y: auto;
+    align-items: flex-start;
+    position: relative;
   }
 
-  /* Folder boxes */
+  /* Folder cards */
   .folder {
     width: 180px;
     height: 150px;
     border-radius: 16px;
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 224, 0.3);
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 500;
     color: #333;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    user-select: none;
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .folder:hover {
-    transform: translateY(-3px);
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 224, 0.4);
+    transform: scale(1.03);
   }
 
   .none {
     font-size: 1.2rem;
     color: rgba(0, 0, 0, 0.4);
+    animation: fadeIn 1s ease forwards;
+    opacity: 0;
   }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Page headers */
+  .page-title {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    opacity: 0.9;
+  }
+
+  /* Content fade */
+  .content {
+    width: 100%;
+    margin-top: 60px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start;
+  }
+
 </style>
 </head>
 <body>
 
   <div class="sidebar">
     <div class="nav-top">
-      <div class="nav-item active">Home</div>
-      <div class="nav-item">Profile</div>
-      <div class="nav-item">Settings</div>
-      <div class="nav-item">About</div>
+      <div class="nav-item active" data-page="home">🏠 Home</div>
+      <div class="nav-item" data-page="profile">👤 Profile</div>
+      <div class="nav-item" data-page="settings">⚙️ Settings</div>
+      <div class="nav-item" data-page="about">ℹ️ About</div>
     </div>
 
     <div class="nav-bottom">
-      <small style="opacity: 0.6;">Logged in as: <strong>Finley</strong></small>
+      Logged in as: <strong>Finley</strong>
     </div>
   </div>
 
-  <div class="main" id="main">
-    <!-- Folder list goes here -->
-  </div>
+  <div class="main" id="main"></div>
 
   <script>
-    const folders = []; // Add your folders here, e.g. ['Projects', 'Photos', 'Music']
-
     const main = document.getElementById('main');
-    if (folders.length === 0) {
-      const msg = document.createElement('div');
-      msg.classList.add('none');
-      msg.textContent = 'None';
-      main.appendChild(msg);
-    } else {
-      folders.forEach(name => {
-        const div = document.createElement('div');
-        div.classList.add('folder');
-        div.textContent = name;
-        main.appendChild(div);
+    const navItems = document.querySelectorAll('.nav-item');
+
+    const folders = ['History', 'Science', 'Spanish', 'Basketball Facts'];
+
+    function renderHome() {
+      main.innerHTML = `<div class='page-title'>Your Folders</div><div class='content' id='folder-container'></div>`;
+      const container = document.getElementById('folder-container');
+      if (folders.length === 0) {
+        const msg = document.createElement('div');
+        msg.classList.add('none');
+        msg.textContent = 'None';
+        container.appendChild(msg);
+      } else {
+        folders.forEach((name, i) => {
+          const div = document.createElement('div');
+          div.classList.add('folder');
+          div.textContent = name;
+          div.style.animationDelay = `${i * 0.08}s`;
+          container.appendChild(div);
+        });
+      }
+    }
+
+    function renderProfile() {
+      main.innerHTML = `
+        <div class='page-title'>Profile</div>
+        <div class='content'><div class='none'>Profile editing coming soon!</div></div>
+      `;
+    }
+
+    function renderSettings() {
+      main.innerHTML = `
+        <div class='page-title'>Settings</div>
+        <div class='content'><div class='none'>Customize Steph Study in future updates.</div></div>
+      `;
+    }
+
+    function renderAbout() {
+      main.innerHTML = `
+        <div class='page-title'>About</div>
+        <div class='content'><div class='none'>Steph Study: Learn, Play, Dominate 🏀</div></div>
+      `;
+    }
+
+    function setActive(page) {
+      navItems.forEach(item => {
+        item.classList.toggle('active', item.dataset.page === page);
       });
     }
+
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const page = item.dataset.page;
+        setActive(page);
+        switch (page) {
+          case 'home': renderHome(); break;
+          case 'profile': renderProfile(); break;
+          case 'settings': renderSettings(); break;
+          case 'about': renderAbout(); break;
+        }
+      });
+    });
+
+    // Load default page
+    renderHome();
   </script>
 
 </body>
