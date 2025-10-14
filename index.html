@@ -1,90 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Steph Study</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liquid Glass UI</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  }
+
+  body {
+    height: 100vh;
+    background: linear-gradient(135deg, #e0e0e0 0%, #f4f4f4 100%);
+    display: flex;
+    color: #1c1c1e;
+  }
+
+  /* Left navigation bar */
+  .sidebar {
+    width: 260px;
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    background-color: rgba(255, 255, 255, 0.35);
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: inset -1px 0 0 rgba(255,255,255,0.2);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .nav-top {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .nav-item {
+    padding: 10px 15px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .nav-item:hover {
+    background: rgba(255, 255, 255, 0.35);
+  }
+
+  .nav-item.active {
+    background: rgba(255, 255, 255, 0.5);
+    font-weight: 600;
+  }
+
+  /* Main content area */
+  .main {
+    flex: 1;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    overflow-y: auto;
+  }
+
+  /* Folder boxes */
+  .folder {
+    width: 180px;
+    height: 150px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .folder:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .none {
+    font-size: 1.2rem;
+    color: rgba(0, 0, 0, 0.4);
+  }
+</style>
 </head>
 <body>
-  <div class="navbar">
-    <div class="logo">Steph Study 🏀</div>
-    <div class="nav-items">
-      <button onclick="toggleBasketballMode()" id="gameModeBtn">🎮 Basketball Mode</button>
-      <button onclick="googleSignIn()">Sign in with Google</button>
-      <button onclick="exportData()">Export</button>
-      <button onclick="importModal()">Import</button>
+
+  <div class="sidebar">
+    <div class="nav-top">
+      <div class="nav-item active">Home</div>
+      <div class="nav-item">Profile</div>
+      <div class="nav-item">Settings</div>
+      <div class="nav-item">About</div>
+    </div>
+
+    <div class="nav-bottom">
+      <small style="opacity: 0.6;">Logged in as: <strong>Finley</strong></small>
     </div>
   </div>
 
-  <div class="container">
-    <aside class="sidebar">
-      <button class="btn" onclick="openCreateFolder()">+ New Folder</button>
-      <div id="folderList" class="folder-list"></div>
-    </aside>
-    <main class="main">
-      <div id="folderView" class="folder-view hidden">
-        <div class="folder-header">
-          <h2 id="folderTitle">Folder Name</h2>
-          <div class="folder-actions">
-            <button onclick="openRenameFolder()">Rename</button>
-            <button onclick="deleteFolder()">Delete</button>
-          </div>
-        </div>
-        <div class="folder-controls">
-          <button onclick="openAddCard()">+ Add Card</button>
-          <button onclick="openBulkAdd()">Bulk Add</button>
-          <button onclick="startMode('flashcard')">Study</button>
-          <button onclick="startMode('sorting')">Sort</button>
-          <button onclick="startMode('test')">Test</button>
-          <button onclick="startMode('game')" id="gameButton">Game</button>
-        </div>
-        <div id="cardList" class="card-list"></div>
-      </div>
-
-      <div id="studyView" class="study-view hidden">
-        <div class="study-header">
-          <h2 id="studyFolderName">Folder</h2>
-          <button onclick="endStudy()">← Back</button>
-        </div>
-        <div class="card-flip" onclick="flipCard()" id="flipCard">
-          <div class="card-inner" id="cardInner">
-            <div class="card-front" id="cardFront"></div>
-            <div class="card-back" id="cardBack"></div>
-          </div>
-        </div>
-        <div class="study-controls">
-          <button onclick="markKnow()">Know</button>
-          <button onclick="markDont()">Don't Know</button>
-        </div>
-      </div>
-
-      <div id="testView" class="test-view hidden">
-        <div class="test-header">
-          <h2 id="testFolderName">Test</h2>
-          <button onclick="endTest()">← Back</button>
-        </div>
-        <div class="test-question" id="testQuestion"></div>
-        <div class="test-options" id="testOptions"></div>
-      </div>
-
-      <div id="gameView" class="game-view hidden">
-        <div class="game-header">
-          <h2>Basketball Mode: <span id="gameFolderName"></span></h2>
-          <button onclick="endGame()">← Back</button>
-        </div>
-        <div class="game-timer" id="gameTimer">10s</div>
-        <iframe id="gameIframe" src="https://basketbros.bitbucket.io" class="game-frame"></iframe>
-        <div id="gameBlocker" class="game-blocker"></div>
-        <div id="gameQuestionArea" class="game-question-area hidden"></div>
-      </div>
-    </main>
+  <div class="main" id="main">
+    <!-- Folder list goes here -->
   </div>
 
-  <div id="modal" class="modal hidden">
-    <div class="modal-content" id="modalContent"></div>
-  </div>
+  <script>
+    const folders = []; // Add your folders here, e.g. ['Projects', 'Photos', 'Music']
 
-  <script src="script.js"></script>
+    const main = document.getElementById('main');
+    if (folders.length === 0) {
+      const msg = document.createElement('div');
+      msg.classList.add('none');
+      msg.textContent = 'None';
+      main.appendChild(msg);
+    } else {
+      folders.forEach(name => {
+        const div = document.createElement('div');
+        div.classList.add('folder');
+        div.textContent = name;
+        main.appendChild(div);
+      });
+    }
+  </script>
+
 </body>
 </html>
