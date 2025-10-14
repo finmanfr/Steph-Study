@@ -3,10 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Steph Study</title>
+  <title>Steph Study 🏀</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <header>
+    <h1>Steph Study 🏀</h1>
+    <div class="mode-buttons">
+      <button onclick="setMode('flashcards')">Flashcards</button>
+      <button onclick="setMode('sorting')">Sorting</button>
+      <button onclick="setMode('test')">Test</button>
+      <button onclick="setMode('game')">Game</button>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section id="folder-section">
+      <h2>Folders</h2>
+      <div id="folders"></div>
+      <button id="create-folder-btn" onclick="createFolder()">+ Create Folder</button>
+    </section>
+
+    <section id="flashcard-section" class="hidden">
+      <h2 id="folder-name"></h2>
+      <div id="flashcards-container"></div>
+      <div class="flashcard-buttons">
+        <button onclick="addFlashcard()">+ Add Flashcard</button>
+        <button onclick="goBack()">← Back to Folders</button>
+      </div>
+    </section>
+
+    <section id="game-section" class="hidden">
+      <div id="game-timer">10</div>
+      <iframe id="game-frame" src="https://basketbros.bitbucket.io" allowfullscreen></iframe>
+      <div id="question-popup" class="hidden">
+        <h2 id="game-question"></h2>
+        <input id="game-answer" placeholder="Type your answer...">
+        <button onclick="checkGameAnswer()">Submit</button>
+      </div>
+    </section>
+  </main>
+
   <script src="script.js"></script>
 </body>
 </html>
