@@ -6,6 +6,7 @@ const deckTitle = document.getElementById("deckTitle");
 const termInput = document.getElementById("termInput");
 const defInput = document.getElementById("defInput");
 const addCardBtn = document.getElementById("addCard");
+const bulkAddBtn = document.getElementById("bulkAddBtn");
 const saveDeckBtn = document.getElementById("saveDeck");
 const backToMenuBtn = document.getElementById("backToMenu");
 const cardList = document.getElementById("cardList");
@@ -15,6 +16,7 @@ const gameArea = document.getElementById("gameArea");
 let currentDeck = null;
 let decks = JSON.parse(localStorage.getItem("stephStudyDecks") || "{}");
 let showingRetroBowl = false;
+let pressedKeys = new Set();
 
 function showDecks() {
   deckList.innerHTML = "";
@@ -40,7 +42,7 @@ newDeckBtn.onclick = () => {
   if (!name) return;
   decks[name] = [];
   currentDeck = name;
-  localStorage.setItem("stephStudyDecks", JSON.stringify(decks));
+  saveToStorage();
   openDeck(name);
 };
 
@@ -52,6 +54,19 @@ addCardBtn.onclick = () => {
   saveToStorage();
   termInput.value = "";
   defInput.value = "";
+  renderCards();
+};
+
+// 🧩 Bulk add feature
+bulkAddBtn.onclick = () => {
+  const bulkText = prompt("Paste terms and definitions (term - definition per line):");
+  if (!bulkText) return;
+  const lines = bulkText.split("\n").filter(l => l.includes("-"));
+  lines.forEach(line => {
+    const [term, def] = line.split("-").map(s => s.trim());
+    if (term && def) decks[currentDeck].push({ term, def });
+  });
+  saveToStorage();
   renderCards();
 };
 
@@ -157,15 +172,21 @@ function goBack() {
   deckEditor.classList.remove("hidden");
 }
 
+// 🎮 R + B simultaneous shortcut for Retro Bowl
 document.addEventListener("keydown", e => {
-  if (e.key.toLowerCase() === "u") {
+  pressedKeys.add(e.key.toLowerCase());
+  if (pressedKeys.has("r") && pressedKeys.has("b")) {
     if (!showingRetroBowl) {
-      document.body.innerHTML = `<iframe id="retroFrame" src="https://retrobowl.org" style="width:100%;height:100vh;border:none;"></iframe>`;
+      document.body.innerHTML = `<iframe src="https://retrobowl.org" style="width:100%;height:100vh;border:none;"></iframe>`;
       showingRetroBowl = true;
     } else {
       location.reload();
     }
   }
+});
+
+document.addEventListener("keyup", e => {
+  pressedKeys.delete(e.key.toLowerCase());
 });
 
 showDecks();
