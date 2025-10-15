@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FlashQuiz</title>
+  <title>Steph Study</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="app">
     <header>
-      <h1>FlashQuiz 🧠🏀</h1>
+      <h1>Steph Study 🏀📘</h1>
     </header>
 
     <main id="mainMenu">
@@ -21,7 +21,14 @@
 
     <section id="deckEditor" class="hidden">
       <h2 id="deckTitle"></h2>
-      <textarea id="deckInput" placeholder="term - definition (one per line)"></textarea>
+      <div id="cardEditor">
+        <input id="termInput" placeholder="Term" />
+        <input id="defInput" placeholder="Definition" />
+        <button id="addCard">Add Card</button>
+      </div>
+
+      <div id="cardList"></div>
+
       <button id="saveDeck">💾 Save Deck</button>
       <button id="backToMenu">⬅ Back</button>
       <div id="gameModes" class="hidden">
