@@ -3,14 +3,18 @@ const deckList = document.getElementById("deckList");
 const newDeckBtn = document.getElementById("newDeckBtn");
 const deckEditor = document.getElementById("deckEditor");
 const deckTitle = document.getElementById("deckTitle");
-const deckInput = document.getElementById("deckInput");
+const termInput = document.getElementById("termInput");
+const defInput = document.getElementById("defInput");
+const addCardBtn = document.getElementById("addCard");
 const saveDeckBtn = document.getElementById("saveDeck");
 const backToMenuBtn = document.getElementById("backToMenu");
+const cardList = document.getElementById("cardList");
 const gameModes = document.getElementById("gameModes");
 const gameArea = document.getElementById("gameArea");
 
 let currentDeck = null;
-let decks = JSON.parse(localStorage.getItem("flashquizDecks") || "{}");
+let decks = JSON.parse(localStorage.getItem("stephStudyDecks") || "{}");
+let showingRetroBowl = false;
 
 function showDecks() {
   deckList.innerHTML = "";
@@ -25,7 +29,7 @@ function showDecks() {
 function openDeck(name) {
   currentDeck = name;
   deckTitle.textContent = name;
-  deckInput.value = decks[name].map(pair => `${pair.term} - ${pair.def}`).join("\n");
+  renderCards();
   mainMenu.classList.add("hidden");
   deckEditor.classList.remove("hidden");
   gameModes.classList.remove("hidden");
@@ -36,17 +40,63 @@ newDeckBtn.onclick = () => {
   if (!name) return;
   decks[name] = [];
   currentDeck = name;
-  localStorage.setItem("flashquizDecks", JSON.stringify(decks));
+  localStorage.setItem("stephStudyDecks", JSON.stringify(decks));
   openDeck(name);
 };
 
-saveDeckBtn.onclick = () => {
-  const lines = deckInput.value.split("\n").filter(l => l.includes("-"));
-  decks[currentDeck] = lines.map(l => {
-    const [term, def] = l.split("-").map(s => s.trim());
-    return { term, def };
+addCardBtn.onclick = () => {
+  const term = termInput.value.trim();
+  const def = defInput.value.trim();
+  if (!term || !def) return alert("Fill out both fields!");
+  decks[currentDeck].push({ term, def });
+  saveToStorage();
+  termInput.value = "";
+  defInput.value = "";
+  renderCards();
+};
+
+function renderCards() {
+  cardList.innerHTML = "";
+  decks[currentDeck].forEach((card, index) => {
+    const div = document.createElement("div");
+    div.className = "cardItem";
+    div.innerHTML = `
+      <span><strong>${card.term}</strong> - ${card.def}</span>
+      <div class="cardActions">
+        <button class="edit">✏️</button>
+        <button class="delete">🗑️</button>
+      </div>
+    `;
+    div.querySelector(".edit").onclick = () => editCard(index);
+    div.querySelector(".delete").onclick = () => deleteCard(index);
+    cardList.appendChild(div);
   });
-  localStorage.setItem("flashquizDecks", JSON.stringify(decks));
+}
+
+function editCard(i) {
+  const newTerm = prompt("Edit term:", decks[currentDeck][i].term);
+  const newDef = prompt("Edit definition:", decks[currentDeck][i].def);
+  if (newTerm && newDef) {
+    decks[currentDeck][i] = { term: newTerm, def: newDef };
+    saveToStorage();
+    renderCards();
+  }
+}
+
+function deleteCard(i) {
+  if (confirm("Delete this card?")) {
+    decks[currentDeck].splice(i, 1);
+    saveToStorage();
+    renderCards();
+  }
+}
+
+function saveToStorage() {
+  localStorage.setItem("stephStudyDecks", JSON.stringify(decks));
+}
+
+saveDeckBtn.onclick = () => {
+  saveToStorage();
   alert("Deck saved!");
   showDecks();
 };
@@ -72,7 +122,6 @@ function startMode(mode) {
 function startShootMode() {
   gameArea.innerHTML = `<iframe id="gameFrame" src="https://basketball-stars.io"></iframe>`;
   const frame = document.getElementById("gameFrame");
-
   let questionInterval = setInterval(askQuestion, 10000);
 
   function askQuestion() {
@@ -110,7 +159,12 @@ function goBack() {
 
 document.addEventListener("keydown", e => {
   if (e.key.toLowerCase() === "u") {
-    document.body.innerHTML = `<iframe src="https://basketball-stars.io" style="width:100%;height:100vh;border:none;"></iframe>`;
+    if (!showingRetroBowl) {
+      document.body.innerHTML = `<iframe id="retroFrame" src="https://retrobowl.org" style="width:100%;height:100vh;border:none;"></iframe>`;
+      showingRetroBowl = true;
+    } else {
+      location.reload();
+    }
   }
 });
 
