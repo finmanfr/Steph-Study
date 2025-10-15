@@ -3,33 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Flashcard Game</title>
-  <link rel="stylesheet" href="styles/style.css" />
+  <title>FlashQuiz</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <aside class="sidebar glass">
-      <h2>FlashLearn</h2>
-      <div id="userSection">
-        <input id="nameInput" type="text" placeholder="Enter your name" />
-        <button id="loginBtn">Login</button>
-      </div>
-      <div id="userInfo" class="hidden">
-        <p id="usernameDisplay"></p>
-        <p>💰 <span id="currency">0</span></p>
-      </div>
-      <button id="sortModeBtn" class="nav-btn">Sorting Mode</button>
-      <button id="basketballModeBtn" class="nav-btn">Basketball Mode</button>
-      <button id="resetBtn" class="nav-btn">Reset Progress</button>
-    </aside>
+  <div id="app">
+    <header>
+      <h1>FlashQuiz 🧠🏀</h1>
+    </header>
 
-    <main class="content glass">
-      <h1 id="modeTitle">No Flashcards Yet</h1>
-      <div id="flashcardArea"></div>
-      <button id="createBtn" class="create-btn">+</button>
+    <main id="mainMenu">
+      <h2>Your Decks</h2>
+      <div id="deckList"></div>
+
+      <button id="newDeckBtn">+ New Deck</button>
     </main>
+
+    <section id="deckEditor" class="hidden">
+      <h2 id="deckTitle"></h2>
+      <textarea id="deckInput" placeholder="term - definition (one per line)"></textarea>
+      <button id="saveDeck">💾 Save Deck</button>
+      <button id="backToMenu">⬅ Back</button>
+      <div id="gameModes" class="hidden">
+        <button class="modeBtn" data-mode="flashcards">Flashcards</button>
+        <button class="modeBtn" data-mode="learn">Learn</button>
+        <button class="modeBtn" data-mode="match">Match</button>
+        <button class="modeBtn" data-mode="test">Test</button>
+        <button class="modeBtn" data-mode="shoot">🏀 Shoot!</button>
+      </div>
+    </section>
+
+    <section id="gameArea" class="hidden"></section>
   </div>
 
-  <script src="scripts/main.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
