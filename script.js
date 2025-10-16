@@ -135,7 +135,7 @@ function startMode(mode) {
 }
 
 function startShootMode() {
-  gameArea.innerHTML = `<iframe id="gameFrame" src="https://basketball-stars.io"></iframe>`;
+  gameArea.innerHTML = `<iframe id="gameFrame" src="https://www.footballgames.org"></iframe>`;
   const frame = document.getElementById("gameFrame");
   let questionInterval = setInterval(askQuestion, 10000);
 
