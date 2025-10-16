@@ -177,7 +177,7 @@ document.addEventListener("keydown", e => {
   pressedKeys.add(e.key.toLowerCase());
   if (pressedKeys.has("r") && pressedKeys.has("b")) {
     if (!showingRetroBowl) {
-      document.body.innerHTML = `<iframe src="https://retrobowl.org" style="width:100%;height:100vh;border:none;"></iframe>`;
+      document.body.innerHTML = `<iframe src="https://www.footballgames.org" style="width:100%;height:100vh;border:none;"></iframe>`;
       showingRetroBowl = true;
     } else {
       location.reload();
