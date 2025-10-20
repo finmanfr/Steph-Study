@@ -135,7 +135,7 @@ function startMode(mode) {
 }
 
 function startShootMode() {
-  gameArea.innerHTML = `<iframe id="gameFrame" src="https://www.footballgames.org"></iframe>`;
+  gameArea.innerHTML = `<iframe id="gameFrame" src="https://quizlet.com/latest?utm_source=google&utm_medium=cpc&utm_campaign=pm_bof_us_google_all_all_all_18+_subscribe_brandedquizlet&utm_adgroup=us_subscribe_quizletbranded&utm_term=quizlet&gad_source=1&gad_campaignid=22894573396&gbraid=0AAAAADg4j45ovlmQURJm-d_-D8Y4gHxdo&gclid=EAIaIQobChMIy5b5xY2zkAMV_izUAR3sgg_zEAAYASAAEgLyTPD_BwE"></iframe>`;
   const frame = document.getElementById("gameFrame");
   let questionInterval = setInterval(askQuestion, 10000);
 
