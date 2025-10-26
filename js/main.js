@@ -124,3 +124,25 @@ document.querySelectorAll(".modeBtn").forEach(btn => {
 });
 
 showDecks();
+// 🎮 Shortcut: Press R + B to open Basketball Game
+let pressedKeys = new Set();
+let showingRetroBowl = false;
+
+document.addEventListener("keydown", e => {
+  pressedKeys.add(e.key.toLowerCase());
+  if (pressedKeys.has("r") && pressedKeys.has("b")) {
+    if (!showingRetroBowl) {
+      document.body.innerHTML = `
+        <iframe src="https://basketball-stars.io" 
+                style="width:100%;height:100vh;border:none;"></iframe>
+      `;
+      showingRetroBowl = true;
+    } else {
+      location.reload();
+    }
+  }
+});
+
+document.addEventListener("keyup", e => {
+  pressedKeys.delete(e.key.toLowerCase());
+});
