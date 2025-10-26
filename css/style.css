@@ -126,3 +126,16 @@ iframe {
   border: none;
   border-radius: 12px;
 }
+#timerDisplay {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background: #2563eb;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
