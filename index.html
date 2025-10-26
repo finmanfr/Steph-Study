@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Steph Study</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Steph Study 🏀📘</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <div id="app">
@@ -15,22 +15,18 @@
     <main id="mainMenu">
       <h2>Your Decks</h2>
       <div id="deckList"></div>
-
       <button id="newDeckBtn">+ New Deck</button>
     </main>
 
     <section id="deckEditor" class="hidden">
       <h2 id="deckTitle"></h2>
-
       <div id="cardEditor">
         <input id="termInput" placeholder="Term" />
         <input id="defInput" placeholder="Definition" />
         <button id="addCard">Add Card</button>
         <button id="bulkAddBtn">Bulk Add</button>
       </div>
-
       <div id="cardList"></div>
-
       <button id="saveDeck">💾 Save Deck</button>
       <button id="backToMenu">⬅ Back</button>
 
@@ -46,6 +42,11 @@
     <section id="gameArea" class="hidden"></section>
   </div>
 
-  <script src="script.js"></script>
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/flashcards.js"></script>
+  <script src="js/shootMode.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
