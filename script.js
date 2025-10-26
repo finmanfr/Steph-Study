@@ -130,8 +130,57 @@ function startMode(mode) {
   gameArea.classList.remove("hidden");
   gameArea.innerHTML = "";
 
-  if (mode === "shoot") startShootMode();
-  else gameArea.innerHTML = `<h2>${mode} mode coming soon!</h2><button onclick="goBack()">⬅ Back</button>`;
+ if (mode === "shoot") startShootMode();
+else if (mode === "flashcard") startFlashcardMode();
+else gameArea.innerHTML = `<h2>${mode} mode coming soon!</h2><button onclick="goBack()">⬅ Back</button>`;
+  function startFlashcardMode() {
+  gameArea.innerHTML = `
+    <div id="flashcard" class="flashcard">
+      <h3 id="cardText"></h3>
+    </div>
+    <div class="controls">
+      <button id="prevCard">⬅ Prev</button>
+      <button id="flipCard">Flip</button>
+      <button id="nextCard">Next ➡</button>
+      <button onclick="goBack()">Back to Deck</button>
+    </div>
+  `;
+
+  const cards = decks[currentDeck];
+  let currentIndex = 0;
+  let showingTerm = true;
+
+  const cardText = document.getElementById("cardText");
+  const flipBtn = document.getElementById("flipCard");
+  const nextBtn = document.getElementById("nextCard");
+  const prevBtn = document.getElementById("prevCard");
+
+  function showCard() {
+    const card = cards[currentIndex];
+    cardText.textContent = showingTerm ? card.term : card.def;
+  }
+
+  flipBtn.onclick = () => {
+    showingTerm = !showingTerm;
+    showCard();
+  };
+
+  nextBtn.onclick = () => {
+    currentIndex = (currentIndex + 1) % cards.length;
+    showingTerm = true;
+    showCard();
+  };
+
+  prevBtn.onclick = () => {
+    currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+    showingTerm = true;
+    showCard();
+  };
+
+  showCard();
+}
+
+
 }
 
 function startShootMode() {
