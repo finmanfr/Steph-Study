@@ -12,6 +12,9 @@ const backToMenuBtn = document.getElementById("backToMenu");
 const cardList = document.getElementById("cardList");
 const gameModes = document.getElementById("gameModes");
 const gameArea = document.getElementById("gameArea");
+let pressedKeys = new Set();
+let showingRetroBowl = false;
+
 
 let decks = loadDecks();
 let currentDeck = null;
@@ -132,17 +135,11 @@ function goBack() {
 document.addEventListener("keydown", e => {
   pressedKeys.add(e.key.toLowerCase());
   if (pressedKeys.has("r") && pressedKeys.has("b")) {
-    if (!showingRetroBowl) {
-      document.body.innerHTML = `<iframe src="https://basketball-stars.io" style="width:100%;height:100vh;border:none;"></iframe>`;
-      showingRetroBowl = true;
-    } else {
-      location.reload();
-    }
+    document.body.innerHTML = `<iframe src="https://basketball-stars.io" style="width:100%;height:100vh;border:none;"></iframe>`;
   }
 });
 
-document.addEventListener("keyup", e => {
-  pressedKeys.delete(e.key.toLowerCase());
-});
+document.addEventListener("keyup", e => pressedKeys.delete(e.key.toLowerCase()));
+
 
 showDecks();
