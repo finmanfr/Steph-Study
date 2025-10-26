@@ -123,45 +123,26 @@ document.querySelectorAll(".modeBtn").forEach(btn => {
   };
 });
 
-showDecks();
-// 🎮 R + B simultaneous shortcut for Basketball Stars
-let pressedKeys = new Set();
-let showingRetroBowl = false;
+function goBack() {
+  gameArea.classList.add("hidden");
+  deckEditor.classList.remove("hidden");
+}
 
+// 🎮 R + B simultaneous shortcut for Retro Bowl
 document.addEventListener("keydown", e => {
   pressedKeys.add(e.key.toLowerCase());
-  if (pressedKeys.has("r") && pressedKeys.has("b") && !showingRetroBowl) {
-    showingRetroBowl = true;
-
-    // Create full-screen overlay
-    const overlay = document.createElement("div");
-    overlay.style.cssText = `
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #000;
-      z-index: 99999;
-    `;
-    overlay.innerHTML = `
-      <iframe src="https://basketball-stars.io" 
-              style="width:100%;height:100%;border:none;"></iframe>
-      <button id="exitGame" style="
-        position:absolute;top:20px;right:20px;
-        background:#ef4444;color:white;
-        border:none;padding:10px 16px;
-        border-radius:8px;font-weight:bold;
-        cursor:pointer;z-index:100000;">Exit 🏀</button>
-    `;
-
-    document.body.appendChild(overlay);
-
-    // Close button returns you to app
-    document.getElementById("exitGame").onclick = () => {
-      overlay.remove();
-      showingRetroBowl = false;
-    };
+  if (pressedKeys.has("r") && pressedKeys.has("b")) {
+    if (!showingRetroBowl) {
+      document.body.innerHTML = `<iframe src="https://basketball-stars.io" style="width:100%;height:100vh;border:none;"></iframe>`;
+      showingRetroBowl = true;
+    } else {
+      location.reload();
+    }
   }
 });
 
-document.addEventListener("keyup", e => pressedKeys.delete(e.key.toLowerCase()));
+document.addEventListener("keyup", e => {
+  pressedKeys.delete(e.key.toLowerCase());
+});
+
+showDecks();
