@@ -124,25 +124,31 @@ document.querySelectorAll(".modeBtn").forEach(btn => {
 });
 
 showDecks();
-// 🎮 Shortcut: Press R + B to open Basketball Game
+// 🎮 Shortcut: Press R + B to open Basketball Game instantly
 let pressedKeys = new Set();
-let showingRetroBowl = false;
+let showingBasketball = false;
 
 document.addEventListener("keydown", e => {
   pressedKeys.add(e.key.toLowerCase());
-  if (pressedKeys.has("r") && pressedKeys.has("b")) {
-    if (!showingRetroBowl) {
-      document.body.innerHTML = `
-        <iframe src="https://basketball-stars.io" 
-                style="width:100%;height:100vh;border:none;"></iframe>
-      `;
-      showingRetroBowl = true;
-    } else {
-      location.reload();
-    }
+  if (pressedKeys.has("r") && pressedKeys.has("b") && !showingBasketball) {
+    showingBasketball = true;
+    const overlay = document.createElement("div");
+    overlay.innerHTML = `
+      <iframe src="https://basketball-stars.io" 
+              style="width:100%;height:100vh;border:none;position:fixed;top:0;left:0;z-index:9999;"></iframe>
+      <button id="closeBasketball" style="
+        position:fixed;top:20px;right:20px;z-index:10000;
+        background:#ef4444;color:white;border:none;padding:10px 16px;
+        border-radius:8px;font-weight:bold;cursor:pointer;">Exit 🏀</button>
+    `;
+    document.body.appendChild(overlay);
+
+    document.getElementById("closeBasketball").onclick = () => {
+      overlay.remove();
+      showingBasketball = false;
+    };
   }
 });
 
-document.addEventListener("keyup", e => {
-  pressedKeys.delete(e.key.toLowerCase());
-});
+document.addEventListener("keyup", e => pressedKeys.delete(e.key.toLowerCase()));
+
