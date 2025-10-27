@@ -36,14 +36,14 @@ function startShootMode(deckName, decks) {
 
   function startCountdown() {
     clearInterval(countdownInterval);
-    timeLeft = 10;
+    timeLeft = 20;
     updateTimer();
     countdownInterval = setInterval(() => {
       timeLeft--;
       updateTimer();
       if (timeLeft <= 0) {
         toggleFrames();
-        timeLeft = 10;
+        timeLeft = 20;
       }
     }, 1000);
   }
