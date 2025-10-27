@@ -1,6 +1,6 @@
 let countdownInterval;
 let showingQuizlet = true;
-let timeLeft = 10;
+let timeLeft = 20;
 let gameRunning = false;
 
 function startShootMode(deckName, decks) {
@@ -17,7 +17,7 @@ function startShootMode(deckName, decks) {
   gameArea.innerHTML = `
     <div id="overlayControls">
       <button id="stopLoopBtn">🛑 Stop</button>
-      <div id="timerDisplay">Next switch in: 10s</div>
+      <div id="timerDisplay">Next switch in: 20s</div>
     </div>
     <div id="iframeWrapper">
       <iframe id="quizletFrame" class="iframeBox" src="https://quizlet.com/latest"></iframe>
