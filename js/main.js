@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
   quiz.style.display = "block";
   game.style.display = "none";
 
-  let timeLeft = 10;
+  let timeLeft = 20;
   timer.textContent = `Next game in: ${timeLeft}s`;
 
   const interval = setInterval(() => {
@@ -82,7 +82,7 @@ function startGame(link) {
   quiz.style.display = "none";
   game.style.display = "block";
 
-  let timeLeft = 10;
+  let timeLeft = 20;
   timer.textContent = `Next Quizlet in: ${timeLeft}s`;
 
   const interval = setInterval(() => {
