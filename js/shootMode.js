@@ -15,6 +15,25 @@ function startShootMode(deckName, decks) {
   app.style.padding = "0";
 
   gameArea.innerHTML = `
+  // 💰 Add currency display
+if (!document.getElementById("currencyDisplay")) {
+  const currencyDiv = document.createElement("div");
+  currencyDiv.id = "currencyDisplay";
+  currencyDiv.style.position = "fixed";
+  currencyDiv.style.bottom = "20px";
+  currencyDiv.style.right = "30px";
+  currencyDiv.style.background = "#00b33c";
+  currencyDiv.style.color = "white";
+  currencyDiv.style.padding = "10px 18px";
+  currencyDiv.style.borderRadius = "30px";
+  currencyDiv.style.fontSize = "1.2rem";
+  currencyDiv.style.fontWeight = "bold";
+  currencyDiv.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+  currencyDiv.style.transition = "transform 0.3s ease";
+  document.body.appendChild(currencyDiv);
+}
+updateCurrencyDisplay();
+
     <div id="overlayControls">
       <button id="stopLoopBtn">🛑 Stop</button>
       <div id="timerDisplay">Next switch in: 20s</div>
