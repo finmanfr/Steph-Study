@@ -8,6 +8,7 @@ function startShootMode(deckName, decks) {
   const app = document.getElementById("app");
   const gameArea = document.getElementById("gameArea");
 
+  // Fullscreen setup
   app.style.width = "100%";
   app.style.height = "100vh";
   app.style.maxWidth = "none";
@@ -23,20 +24,23 @@ function startShootMode(deckName, decks) {
       <iframe id="quizletFrame" class="iframeBox" src="https://quizlet.com/latest"></iframe>
       <iframe id="basketballFrame" class="iframeBox hidden" src="https://basketball-stars.io"></iframe>
     </div>
-    <div id="currencyDisplay" style="
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #22c55e;
-      color: white;
-      padding: 10px 18px;
-      border-radius: 16px;
-      font-weight: bold;
-      font-size: 1.1rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      transition: transform 0.3s ease, opacity 0.3s ease;
-      z-index: 1000;
-    ">💰 $${currency}</div>
+    <div id="currencyDisplay"
+      style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #16a34a;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+        z-index: 9999;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+      ">
+      💰 $${currency}
+    </div>
   `;
 
   const quizletFrame = document.getElementById("quizletFrame");
@@ -45,35 +49,36 @@ function startShootMode(deckName, decks) {
   const stopButton = document.getElementById("stopLoopBtn");
   const currencyDisplay = document.getElementById("currencyDisplay");
 
-  function updateTimer() {
-    timerDisplay.textContent = `Next switch in: ${timeLeft}s`;
+  function updateCurrencyDisplay() {
+    currencyDisplay.textContent = `💰 $${currency}`;
   }
 
-  function addCurrency(amount) {
-    currency += amount;
-    localStorage.setItem("currency", currency);
-    currencyDisplay.textContent = `💰 $${currency}`;
-
-    // Animate a floating +$10
-    const bonus = document.createElement("div");
-    bonus.textContent = `+$${amount}`;
-    bonus.style.position = "fixed";
-    bonus.style.bottom = "60px";
-    bonus.style.right = "30px";
-    bonus.style.color = "#16a34a";
-    bonus.style.fontSize = "1.3rem";
-    bonus.style.fontWeight = "bold";
-    bonus.style.opacity = "1";
-    bonus.style.transition = "all 1s ease-out";
-    bonus.style.zIndex = "1100";
-    document.body.appendChild(bonus);
+  function animateCurrencyGain(amount) {
+    const gain = document.createElement("div");
+    gain.textContent = `+ $${amount}`;
+    gain.style.position = "fixed";
+    gain.style.bottom = "60px";
+    gain.style.right = "30px";
+    gain.style.color = "#22c55e";
+    gain.style.fontSize = "1.3rem";
+    gain.style.fontWeight = "bold";
+    gain.style.opacity = "1";
+    gain.style.transition = "all 1s ease-out";
+    gain.style.zIndex = "9999";
+    document.body.appendChild(gain);
 
     setTimeout(() => {
-      bonus.style.transform = "translateY(-40px)";
-      bonus.style.opacity = "0";
-    }, 100);
+      gain.style.transform = "translateY(-30px)";
+      gain.style.opacity = "0";
+    }, 50);
 
-    setTimeout(() => bonus.remove(), 1000);
+    setTimeout(() => {
+      gain.remove();
+    }, 1000);
+  }
+
+  function updateTimer() {
+    timerDisplay.textContent = `Next switch in: ${timeLeft}s`;
   }
 
   function startCountdown() {
@@ -83,10 +88,10 @@ function startShootMode(deckName, decks) {
     countdownInterval = setInterval(() => {
       timeLeft--;
       updateTimer();
+
       if (timeLeft <= 0) {
         toggleFrames();
         timeLeft = 20;
-        if (!showingQuizlet) addCurrency(10);
       }
     }, 1000);
   }
@@ -95,6 +100,14 @@ function startShootMode(deckName, decks) {
     showingQuizlet = !showingQuizlet;
     quizletFrame.classList.toggle("hidden", !showingQuizlet);
     basketballFrame.classList.toggle("hidden", showingQuizlet);
+
+    // Reward when switching FROM Quizlet
+    if (!showingQuizlet) {
+      currency += 10;
+      localStorage.setItem("currency", currency);
+      updateCurrencyDisplay();
+      animateCurrencyGain(10);
+    }
   }
 
   stopButton.onclick = () => {
