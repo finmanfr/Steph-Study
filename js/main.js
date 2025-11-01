@@ -1,80 +1,100 @@
-function startStudy(link) {
-  const app = document.getElementById("app");
-  if (!app) {
-    console.error("App container not found!");
-    return;
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("quizletLink");
+  const beginBtn = document.getElementById("beginBtn");
+  const historyDiv = document.getElementById("history");
+
+  let pressedKeys = new Set();
+  let showingBasketball = false;
+
+  // Load saved links
+  let linkHistory = JSON.parse(localStorage.getItem("quizletLinks") || "[]");
+  renderHistory();
+
+  beginBtn.onclick = () => {
+    const link = input.value.trim();
+    if (!link) return alert("Please insert a Quizlet link!");
+    if (!linkHistory.includes(link)) {
+      linkHistory.unshift(link);
+      localStorage.setItem("quizletLinks", JSON.stringify(linkHistory));
+    }
+    startStudy(link);
+  };
+
+  function renderHistory() {
+    historyDiv.innerHTML = "";
+    if (linkHistory.length > 0) {
+      const label = document.createElement("p");
+      label.textContent = "Recent Quizlet Links:";
+      historyDiv.appendChild(label);
+    }
+
+    linkHistory.forEach(link => {
+      const btn = document.createElement("button");
+      btn.textContent = link.replace(/^https?:\/\//, "").slice(0, 40) + "...";
+      btn.onclick = () => startStudy(link);
+      historyDiv.appendChild(btn);
+    });
   }
 
-  // Create elements only once
-  if (!document.getElementById("quizFrame")) {
-    app.innerHTML = `
-      <div id="overlayControls">
-        <div id="timerDisplay">Next game in: 20s</div>
-        <div id="cashCounter">💰 $0</div>
-      </div>
-      <div id="iframeWrapper">
-        <iframe id="quizFrame" src="${link}" class="iframeBox"></iframe>
-        <iframe id="gameFrame" src="https://basketball-stars.io" class="iframeBox hidden"></iframe>
-      </div>
+  function startStudy(link) {
+    document.body.innerHTML = `
+      <iframe id="quizFrame" src="${link}" style="width:100%;height:100vh;border:none;"></iframe>
+      <iframe id="gameFrame" src="https://basketball-stars.io" style="width:100%;height:100vh;border:none;display:none;"></iframe>
+      <div id="timerDisplay" style="
+        position: fixed; top: 20px; right: 30px;
+        background: #2563eb; color: white;
+        padding: 8px 14px; border-radius: 8px;
+        font-weight: bold; font-size: 1rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        z-index: 1000;">Next game in: 10s</div>
     `;
+
+    const quiz = document.getElementById("quizFrame");
+    const game = document.getElementById("gameFrame");
+    const timer = document.getElementById("timerDisplay");
+
+    let timeLeft = 10;
+    const interval = setInterval(() => {
+      timeLeft--;
+      timer.textContent = `Next game in: ${timeLeft}s`;
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        startGame(link);
+      }
+    }, 1000);
   }
 
-  const quiz = document.getElementById("quizFrame");
-  const game = document.getElementById("gameFrame");
-  const timer = document.getElementById("timerDisplay");
-  const cashCounter = document.getElementById("cashCounter");
+  function startGame(link) {
+    const quiz = document.getElementById("quizFrame");
+    const game = document.getElementById("gameFrame");
+    const timer = document.getElementById("timerDisplay");
 
-  // Load and show saved cash
-  let cash = parseInt(localStorage.getItem("cash") || "0");
-  cashCounter.textContent = `💰 $${cash}`;
+    quiz.style.display = "none";
+    game.style.display = "block";
 
-  quiz.classList.remove("hidden");
-  game.classList.add("hidden");
+    let timeLeft = 10;
+    const interval = setInterval(() => {
+      timeLeft--;
+      timer.textContent = `Next Quizlet in: ${timeLeft}s`;
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        startStudy(link);
+      }
+    }, 1000);
+  }
 
-  let timeLeft = 20;
-  timer.textContent = `Next game in: ${timeLeft}s`;
-
-  const interval = setInterval(() => {
-    timeLeft--;
-    timer.textContent = `Next game in: ${timeLeft}s`;
-
-    if (timeLeft <= 0) {
-      clearInterval(interval);
-      cash += 10;
-      localStorage.setItem("cash", cash);
-      animateCashCounter(cashCounter, cash);
-      startGame(link);
+  // 🎮 R + B shortcut to jump to basketball mode
+  document.addEventListener("keydown", e => {
+    pressedKeys.add(e.key.toLowerCase());
+    if (pressedKeys.has("r") && pressedKeys.has("b")) {
+      if (!showingBasketball) {
+        document.body.innerHTML = `
+          <iframe src="https://basketball-stars.io" style="width:100%;height:100vh;border:none;"></iframe>
+        `;
+        showingBasketball = true;
+      }
     }
-  }, 1000);
-}
+  });
 
-function startGame(link) {
-  const quiz = document.getElementById("quizFrame");
-  const game = document.getElementById("gameFrame");
-  const timer = document.getElementById("timerDisplay");
-
-  quiz.classList.add("hidden");
-  game.classList.remove("hidden");
-
-  let timeLeft = 20;
-  timer.textContent = `Next Quizlet in: ${timeLeft}s`;
-
-  const interval = setInterval(() => {
-    timeLeft--;
-    timer.textContent = `Next Quizlet in: ${timeLeft}s`;
-
-    if (timeLeft <= 0) {
-      clearInterval(interval);
-      startStudy(link);
-    }
-  }, 1000);
-}
-
-function animateCashCounter(el, amount) {
-  el.textContent = `💰 $${amount}`;
-  el.style.transform = "scale(1.3)";
-  el.style.transition = "transform 0.3s ease";
-  setTimeout(() => {
-    el.style.transform = "scale(1)";
-  }, 300);
-}
+  document.addEventListener("keyup", e => pressedKeys.delete(e.key.toLowerCase()));
+});
