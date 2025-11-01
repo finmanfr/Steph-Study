@@ -24,58 +24,12 @@ function startShootMode(deckName, decks) {
       <iframe id="quizletFrame" class="iframeBox" src="https://quizlet.com/latest"></iframe>
       <iframe id="basketballFrame" class="iframeBox hidden" src="https://basketball-stars.io"></iframe>
     </div>
-    <div id="currencyDisplay"
-      style="
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: #16a34a;
-        color: white;
-        padding: 10px 18px;
-        border-radius: 20px;
-        font-weight: bold;
-        font-size: 1.1rem;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-        z-index: 9999;
-        transition: transform 0.3s ease, opacity 0.3s ease;
-      ">
-      💰 $${currency}
-    </div>
   `;
 
   const quizletFrame = document.getElementById("quizletFrame");
   const basketballFrame = document.getElementById("basketballFrame");
   const timerDisplay = document.getElementById("timerDisplay");
   const stopButton = document.getElementById("stopLoopBtn");
-  const currencyDisplay = document.getElementById("currencyDisplay");
-
-  function updateCurrencyDisplay() {
-    currencyDisplay.textContent = `💰 $${currency}`;
-  }
-
-  function animateCurrencyGain(amount) {
-    const gain = document.createElement("div");
-    gain.textContent = `+ $${amount}`;
-    gain.style.position = "fixed";
-    gain.style.bottom = "60px";
-    gain.style.right = "30px";
-    gain.style.color = "#22c55e";
-    gain.style.fontSize = "1.3rem";
-    gain.style.fontWeight = "bold";
-    gain.style.opacity = "1";
-    gain.style.transition = "all 1s ease-out";
-    gain.style.zIndex = "9999";
-    document.body.appendChild(gain);
-
-    setTimeout(() => {
-      gain.style.transform = "translateY(-30px)";
-      gain.style.opacity = "0";
-    }, 50);
-
-    setTimeout(() => {
-      gain.remove();
-    }, 1000);
-  }
 
   function updateTimer() {
     timerDisplay.textContent = `Next switch in: ${timeLeft}s`;
@@ -105,8 +59,6 @@ function startShootMode(deckName, decks) {
     if (!showingQuizlet) {
       currency += 10;
       localStorage.setItem("currency", currency);
-      updateCurrencyDisplay();
-      animateCurrencyGain(10);
     }
   }
 
