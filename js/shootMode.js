@@ -8,7 +8,7 @@ function startShootMode(deckName, decks) {
   const app = document.getElementById("app");
   const gameArea = document.getElementById("gameArea");
 
-  // Make the view full screen without breaking layout
+  // Fullscreen layout
   app.style.width = "100%";
   app.style.height = "100vh";
   app.style.maxWidth = "none";
@@ -24,17 +24,15 @@ function startShootMode(deckName, decks) {
       <iframe id="quizletFrame" class="iframeBox" src="https://quizlet.com/latest"></iframe>
       <iframe id="basketballFrame" class="iframeBox hidden" src="https://basketball-stars.io"></iframe>
     </div>
-    <div id="currencyDisplay"
-      style="
-        position: fixed; bottom: 20px; right: 20px;
-        background: #22c55e; color: white;
-        padding: 10px 16px; border-radius: 20px;
-        font-weight: bold; font-size: 1.1rem;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        z-index: 1000; transition: all 0.3s ease;
-      ">
-      💰 $${currency}
-    </div>
+    <div id="currencyDisplay" style="
+      position: fixed; bottom: 20px; right: 30px;
+      background: #22c55e; color: white;
+      padding: 8px 14px; border-radius: 10px;
+      font-weight: bold; font-size: 1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    ">💰 $${currency}</div>
   `;
 
   const quizletFrame = document.getElementById("quizletFrame");
@@ -47,15 +45,39 @@ function startShootMode(deckName, decks) {
     timerDisplay.textContent = `Next switch in: ${timeLeft}s`;
   }
 
+  function updateCurrencyDisplay() {
+    currencyDisplay.textContent = `💰 $${currency}`;
+  }
+
+  function addCurrency(amount) {
+    currency += amount;
+    localStorage.setItem("currency", currency);
+    updateCurrencyDisplay();
+
+    // 💸 Animate gain
+    currencyDisplay.style.transform = "scale(1.3)";
+    currencyDisplay.style.opacity = "0.8";
+    setTimeout(() => {
+      currencyDisplay.style.transform = "scale(1)";
+      currencyDisplay.style.opacity = "1";
+    }, 300);
+  }
+
   function startCountdown() {
     clearInterval(countdownInterval);
     timeLeft = 20;
     updateTimer();
+
     countdownInterval = setInterval(() => {
       timeLeft--;
       updateTimer();
+
       if (timeLeft <= 0) {
         toggleFrames();
+
+        // Reward $10 after each Quizlet session
+        if (showingQuizlet) addCurrency(10);
+
         timeLeft = 20;
       }
     }, 1000);
@@ -65,38 +87,6 @@ function startShootMode(deckName, decks) {
     showingQuizlet = !showingQuizlet;
     quizletFrame.classList.toggle("hidden", !showingQuizlet);
     basketballFrame.classList.toggle("hidden", showingQuizlet);
-
-    // When leaving Quizlet, give $10
-    if (!showingQuizlet) {
-      addCurrency(10);
-    }
-  }
-
-  function addCurrency(amount) {
-    currency += amount;
-    localStorage.setItem("currency", currency);
-    currencyDisplay.textContent = `💰 $${currency}`;
-
-    // Create floating +$10 animation
-    const floatText = document.createElement("div");
-    floatText.textContent = `+$${amount}`;
-    floatText.style.position = "fixed";
-    floatText.style.bottom = "60px";
-    floatText.style.right = "30px";
-    floatText.style.color = "#22c55e";
-    floatText.style.fontWeight = "bold";
-    floatText.style.fontSize = "1.2rem";
-    floatText.style.transition = "all 1s ease-out";
-    floatText.style.opacity = "1";
-    floatText.style.zIndex = "1100";
-    document.body.appendChild(floatText);
-
-    setTimeout(() => {
-      floatText.style.transform = "translateY(-50px)";
-      floatText.style.opacity = "0";
-    }, 50);
-
-    setTimeout(() => floatText.remove(), 1000);
   }
 
   stopButton.onclick = () => {
@@ -104,7 +94,6 @@ function startShootMode(deckName, decks) {
     goBackFromGame();
   };
 
-  // start the timer loop
   gameRunning = true;
   startCountdown();
 }
@@ -120,7 +109,7 @@ function goBackFromGame() {
   gameArea.classList.add("hidden");
   deckEditor.classList.remove("hidden");
 
-  // restore layout
+  // Restore layout
   app.style.width = "90%";
   app.style.maxWidth = "800px";
   app.style.borderRadius = "20px";
