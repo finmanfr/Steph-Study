@@ -2,6 +2,7 @@ let countdownInterval;
 let showingQuizlet = true;
 let timeLeft = 20;
 let gameRunning = false;
+let currency = parseInt(localStorage.getItem("currency") || "0");
 
 function startShootMode(deckName, decks) {
   const app = document.getElementById("app");
@@ -15,25 +16,6 @@ function startShootMode(deckName, decks) {
   app.style.padding = "0";
 
   gameArea.innerHTML = `
-  // 💰 Add currency display
-if (!document.getElementById("currencyDisplay")) {
-  const currencyDiv = document.createElement("div");
-  currencyDiv.id = "currencyDisplay";
-  currencyDiv.style.position = "fixed";
-  currencyDiv.style.bottom = "20px";
-  currencyDiv.style.right = "30px";
-  currencyDiv.style.background = "#00b33c";
-  currencyDiv.style.color = "white";
-  currencyDiv.style.padding = "10px 18px";
-  currencyDiv.style.borderRadius = "30px";
-  currencyDiv.style.fontSize = "1.2rem";
-  currencyDiv.style.fontWeight = "bold";
-  currencyDiv.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
-  currencyDiv.style.transition = "transform 0.3s ease";
-  document.body.appendChild(currencyDiv);
-}
-updateCurrencyDisplay();
-
     <div id="overlayControls">
       <button id="stopLoopBtn">🛑 Stop</button>
       <div id="timerDisplay">Next switch in: 20s</div>
@@ -42,12 +24,24 @@ updateCurrencyDisplay();
       <iframe id="quizletFrame" class="iframeBox" src="https://quizlet.com/latest"></iframe>
       <iframe id="basketballFrame" class="iframeBox hidden" src="https://basketball-stars.io"></iframe>
     </div>
+    <div id="currencyDisplay"
+      style="
+        position: fixed; bottom: 20px; right: 20px;
+        background: #22c55e; color: white;
+        padding: 10px 16px; border-radius: 20px;
+        font-weight: bold; font-size: 1.1rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        z-index: 1000; transition: all 0.3s ease;
+      ">
+      💰 $${currency}
+    </div>
   `;
 
   const quizletFrame = document.getElementById("quizletFrame");
   const basketballFrame = document.getElementById("basketballFrame");
   const timerDisplay = document.getElementById("timerDisplay");
   const stopButton = document.getElementById("stopLoopBtn");
+  const currencyDisplay = document.getElementById("currencyDisplay");
 
   function updateTimer() {
     timerDisplay.textContent = `Next switch in: ${timeLeft}s`;
@@ -71,6 +65,38 @@ updateCurrencyDisplay();
     showingQuizlet = !showingQuizlet;
     quizletFrame.classList.toggle("hidden", !showingQuizlet);
     basketballFrame.classList.toggle("hidden", showingQuizlet);
+
+    // When leaving Quizlet, give $10
+    if (!showingQuizlet) {
+      addCurrency(10);
+    }
+  }
+
+  function addCurrency(amount) {
+    currency += amount;
+    localStorage.setItem("currency", currency);
+    currencyDisplay.textContent = `💰 $${currency}`;
+
+    // Create floating +$10 animation
+    const floatText = document.createElement("div");
+    floatText.textContent = `+$${amount}`;
+    floatText.style.position = "fixed";
+    floatText.style.bottom = "60px";
+    floatText.style.right = "30px";
+    floatText.style.color = "#22c55e";
+    floatText.style.fontWeight = "bold";
+    floatText.style.fontSize = "1.2rem";
+    floatText.style.transition = "all 1s ease-out";
+    floatText.style.opacity = "1";
+    floatText.style.zIndex = "1100";
+    document.body.appendChild(floatText);
+
+    setTimeout(() => {
+      floatText.style.transform = "translateY(-50px)";
+      floatText.style.opacity = "0";
+    }, 50);
+
+    setTimeout(() => floatText.remove(), 1000);
   }
 
   stopButton.onclick = () => {
