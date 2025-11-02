@@ -95,22 +95,7 @@ function startGame(link) {
   }, 1000);
 }
 
-  // Create a copy of the timer UI at the bottom (placeholder)
-const bottomTimer = document.createElement("div");
-bottomTimer.id = "bottom-timer";
-bottomTimer.textContent = "$--"; // Placeholder text
-bottomTimer.style.position = "fixed";
-bottomTimer.style.bottom = "20px";
-bottomTimer.style.left = "50%";
-bottomTimer.style.transform = "translateX(-50%)";
-bottomTimer.style.fontSize = "1.5rem";
-bottomTimer.style.color = "#fff";
-bottomTimer.style.background = "rgba(0, 0, 0, 0.5)";
-bottomTimer.style.padding = "10px 20px";
-bottomTimer.style.borderRadius = "10px";
-bottomTimer.style.zIndex = "9999";
 
-document.body.appendChild(bottomTimer);
 
 
 
