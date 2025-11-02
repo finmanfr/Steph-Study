@@ -50,17 +50,22 @@ function startShootMode(deckName, decks) {
     }, 1000);
   }
 
-  function toggleFrames() {
-    showingQuizlet = !showingQuizlet;
-    quizletFrame.classList.toggle("hidden", !showingQuizlet);
-    basketballFrame.classList.toggle("hidden", showingQuizlet);
+function toggleFrames() {
+  showingQuizlet = !showingQuizlet;
+  quizletFrame.classList.toggle("hidden", !showingQuizlet);
+  basketballFrame.classList.toggle("hidden", showingQuizlet);
 
-    // Reward when switching FROM Quizlet
-    if (!showingQuizlet) {
-      currency += 10;
-      localStorage.setItem("currency", currency);
-    }
+  // Reward when switching FROM Game → TO Quizlet
+  if (showingQuizlet) {
+    currency += 10;
+    localStorage.setItem("currency", currency);
+
+    // Optional: update bottom display if it exists
+    const bottomTimer = document.getElementById("bottom-timer");
+    if (bottomTimer) bottomTimer.textContent = `$${currency}`;
   }
+}
+
 
   stopButton.onclick = () => {
     clearInterval(countdownInterval);
