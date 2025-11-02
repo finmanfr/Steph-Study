@@ -1,7 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Steph Study - Study & Shoot</title>
+
+  <!-- Google Sign-In script -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- Fonts & Icon -->
+  <link rel="icon" type="image/png" href="https://www.nicepng.com/png/full/241-2419786_steph-curry-shooting-stance-stephen-curry-with-mouthpiece.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+
   <style>
     body {
       font-family: "Poppins", sans-serif;
@@ -15,83 +25,72 @@
       align-items: center;
       text-align: center;
     }
-    h1 { font-size: 4rem; font-weight: 800; margin-bottom: 20px; }
-    button {
-      font-size: 1.3rem;
-      padding: 15px 25px;
-      border: none;
-      border-radius: 40px;
-      margin: 8px;
-      background: #00ff3c;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s;
+
+    h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      margin-bottom: 20px;
     }
-    button:hover { background: #00cc2f; }
-    #info {
-      margin-top: 30px;
-      max-width: 600px;
-      font-size: 1rem;
-      line-height: 1.4;
+
+    #g_id_signin {
+      margin-top: 20px;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 10px;
+      font-size: 0.9rem;
+      color: #333;
     }
   </style>
 
-  <!-- ✅ Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <!-- ✅ Add jwt-decode -->
-  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
-
   <script>
-    window.onload = function () {
-      // Always disable any automatic sign-in restore
-      google.accounts.id.disableAutoSelect();
-      google.accounts.id.revoke(); // clear stored session, force new sign-in
+    // Handle Google login response
+    function handleCredentialResponse(response) {
+      const data = jwt_decode(response.credential);
+      console.log("Logged in as:", data.name, data.email);
 
+      // Show welcome text briefly then go to app
+      document.body.innerHTML = `
+        <h1>Welcome, ${data.name} 👋</h1>
+        <p>Loading Steph Study...</p>
+      `;
+      setTimeout(() => {
+        window.location.href = "main.html";
+      }, 1500);
+    }
+
+    // Decode JWT token (Google gives us a token with user info)
+    function jwt_decode(token) {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    }
+
+    window.onload = function () {
       google.accounts.id.initialize({
         client_id: "329250707921-o46thrivup8avr0rlbngtjnqdthrfgkr.apps.googleusercontent.com",
-        callback: handleGoogleSignIn,
-        auto_select: false,
-        ux_mode: "popup"
+        callback: handleCredentialResponse
       });
-
-      // Always show prompt, even if they’ve signed in before
-      google.accounts.id.prompt(notification => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          console.log("Prompt not shown:", notification.getNotDisplayedReason());
-        }
-      });
+      google.accounts.id.renderButton(
+        document.getElementById("g_id_signin"),
+        { theme: "filled_blue", size: "large", width: 250 }
+      );
     };
-
-    function handleGoogleSignIn(response) {
-      const data = jwt_decode(response.credential);
-      const name = data.name || data.email;
-      alert("Welcome, " + name + "!");
-      window.location.href = "main.html";
-    }
   </script>
 </head>
 
 <body>
-  <h1>Steph Study 🏀</h1>
-  <p>Sign in to start studying and shooting!</p>
+  <h1>Steph Study</h1>
+  <p>Sign in to start studying and shooting 🏀</p>
+  <div id="g_id_signin"></div>
 
-  <div id="g_id_onload"
-    data-client_id="329250707921-o46thrivup8avr0rlbngtjnqdthrfgkr.apps.googleusercontent.com"
-    data-context="signin"
-    data-ux_mode="popup"
-    data-callback="handleGoogleSignIn"
-    data-auto_select="false">
-  </div>
-
-  <div class="g_id_signin"
-    data-type="standard"
-    data-shape="pill"
-    data-theme="outline"
-    data-text="signin_with"
-    data-size="large"
-    data-logo_alignment="left">
-  </div>
-
-  <div id="info"></div>
+  <footer>© 2025 Steph Study</footer>
 </body>
 </html>
