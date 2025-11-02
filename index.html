@@ -84,6 +84,46 @@
       font-size: 0.9rem;
       color: #333;
     }
+
+    /* Profile Circle */
+    #profileCircle {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid white;
+      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+      cursor: pointer;
+      display: none;
+      z-index: 1000;
+    }
+    #profileCircle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Logout menu */
+    #logoutMenu {
+      position: fixed;
+      bottom: 90px;
+      left: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      display: none;
+      padding: 10px 15px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      z-index: 1000;
+    }
+    #logoutMenu:hover {
+      background: #f0f0f0;
+    }
   </style>
 </head>
 
@@ -106,6 +146,10 @@
 
   <footer>© 2025 Steph Study</footer>
 
+  <!-- Profile Circle and Logout Menu -->
+  <div id="profileCircle"><img id="profileImg" src="" alt="Profile" /></div>
+  <div id="logoutMenu">Log out</div>
+
   <script>
     // Decode JWT
     function jwt_decode(token) {
@@ -125,13 +169,33 @@
       const data = jwt_decode(response.credential);
       console.log("Logged in as:", data.name, data.email);
 
-      // Update UI
+      // Show content
       document.getElementById("welcomeText").innerText = `Welcome, ${data.name} 👋`;
       document.getElementById("g_id_signin").style.display = "none";
       document.getElementById("inputContainer").style.display = "flex";
+
+      // Show profile circle
+      const profileCircle = document.getElementById("profileCircle");
+      const profileImg = document.getElementById("profileImg");
+      profileImg.src = data.picture;
+      profileCircle.style.display = "block";
+
+      // Save login info locally
+      localStorage.setItem("steph_user", JSON.stringify(data));
     }
 
+    // Initialize Google Sign-In
     window.onload = function () {
+      const saved = localStorage.getItem("steph_user");
+      if (saved) {
+        const data = JSON.parse(saved);
+        document.getElementById("welcomeText").innerText = `Welcome back, ${data.name} 👋`;
+        document.getElementById("g_id_signin").style.display = "none";
+        document.getElementById("inputContainer").style.display = "flex";
+        document.getElementById("profileImg").src = data.picture;
+        document.getElementById("profileCircle").style.display = "block";
+      }
+
       google.accounts.id.initialize({
         client_id: "329250707921-o46thrivup8avr0rlbngtjnqdthrfgkr.apps.googleusercontent.com",
         callback: handleCredentialResponse,
@@ -142,6 +206,22 @@
         width: 250,
       });
     };
+
+    // Profile circle click → toggle logout menu
+    const profileCircle = document.getElementById("profileCircle");
+    const logoutMenu = document.getElementById("logoutMenu");
+
+    profileCircle.addEventListener("click", () => {
+      logoutMenu.style.display =
+        logoutMenu.style.display === "block" ? "none" : "block";
+    });
+
+    // Logout click
+    logoutMenu.addEventListener("click", () => {
+      localStorage.removeItem("steph_user");
+      google.accounts.id.disableAutoSelect();
+      location.reload();
+    });
   </script>
 
   <script src="js/main.js"></script>
