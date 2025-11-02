@@ -1,14 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Steph Study – Study & Shoot</title>
-
-  <link rel="icon" type="image/png"
-    href="https://www.nicepng.com/png/full/241-2419786_steph-curry-shooting-stance-stephen-curry-with-mouthpiece.png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-
   <style>
     body {
       font-family: "Poppins", sans-serif;
@@ -22,33 +15,19 @@
       align-items: center;
       text-align: center;
     }
-
     h1 { font-size: 4rem; font-weight: 800; margin-bottom: 20px; }
-
-    input, button {
+    button {
       font-size: 1.3rem;
       padding: 15px 25px;
       border: none;
       border-radius: 40px;
       margin: 8px;
-    }
-
-    input {
-      background: #ccc;
-      width: 300px;
-      text-align: center;
-      font-weight: 600;
-    }
-
-    button {
       background: #00ff3c;
       font-weight: 700;
       cursor: pointer;
       transition: 0.2s;
     }
-
     button:hover { background: #00cc2f; }
-
     #info {
       margin-top: 30px;
       max-width: 600px;
@@ -59,58 +38,60 @@
 
   <!-- ✅ Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- ✅ Add jwt-decode -->
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+
+  <script>
+    window.onload = function () {
+      // Always disable any automatic sign-in restore
+      google.accounts.id.disableAutoSelect();
+      google.accounts.id.revoke(); // clear stored session, force new sign-in
+
+      google.accounts.id.initialize({
+        client_id: "329250707921-o46thrivup8avr0rlbngtjnqdthrfgkr.apps.googleusercontent.com",
+        callback: handleGoogleSignIn,
+        auto_select: false,
+        ux_mode: "popup"
+      });
+
+      // Always show prompt, even if they’ve signed in before
+      google.accounts.id.prompt(notification => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          console.log("Prompt not shown:", notification.getNotDisplayedReason());
+        }
+      });
+    };
+
+    function handleGoogleSignIn(response) {
+      const data = jwt_decode(response.credential);
+      const name = data.name || data.email;
+      alert("Welcome, " + name + "!");
+      window.location.href = "main.html";
+    }
+  </script>
 </head>
 
 <body>
   <h1>Steph Study 🏀</h1>
   <p>Sign in to start studying and shooting!</p>
 
-  <!-- Google Sign-In button -->
   <div id="g_id_onload"
-       data-client_id="329250707921-o46thrivup8avr0rlbngtjnqdthrfgkr.apps.googleusercontent.com"
-       data-context="signin"
-       data-ux_mode="popup"
-       data-callback="handleGoogleSignIn"
-       data-auto_select="false">
+    data-client_id="329250707921-o46thrivup8avr0rlbngtjnqdthrfgkr.apps.googleusercontent.com"
+    data-context="signin"
+    data-ux_mode="popup"
+    data-callback="handleGoogleSignIn"
+    data-auto_select="false">
   </div>
 
   <div class="g_id_signin"
-       data-type="standard"
-       data-shape="pill"
-       data-theme="outline"
-       data-text="signin_with"
-       data-size="large"
-       data-logo_alignment="left">
+    data-type="standard"
+    data-shape="pill"
+    data-theme="outline"
+    data-text="signin_with"
+    data-size="large"
+    data-logo_alignment="left">
   </div>
 
   <div id="info"></div>
-
-  <script>
-    // ✅ Google sign-in callback
-    function handleGoogleSignIn(response) {
-      const data = decodeJwtResponse(response.credential);
-      console.log("Signed in as:", data.name, data.email);
-      document.getElementById("info").innerHTML =
-        `<strong>Welcome, ${data.name}!</strong><br>Loading your study session...`;
-
-      // Save user info if needed
-      localStorage.setItem("stephUser", JSON.stringify(data));
-
-      // Redirect into your main.js-driven flow
-      window.location.href = "main.html"; // or however your JS loads the next part
-    }
-
-    // Helper to decode JWT
-    function decodeJwtResponse(token) {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64).split('').map(c =>
-          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-        ).join('')
-      );
-      return JSON.parse(jsonPayload);
-    }
-  </script>
 </body>
 </html>
