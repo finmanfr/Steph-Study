@@ -10,15 +10,25 @@ document.addEventListener("DOMContentLoaded", () => {
   let linkHistory = JSON.parse(localStorage.getItem("quizletLinks") || "[]");
   renderHistory();
 
-  beginBtn.onclick = () => {
-    const link = input.value.trim();
-    if (!link) return alert("Please insert a Quizlet link!");
-    if (!linkHistory.includes(link)) {
-      linkHistory.unshift(link);
-      localStorage.setItem("quizletLinks", JSON.stringify(linkHistory));
-    }
-    startStudy(link);
-  };
+ beginBtn.onclick = () => {
+  const link = input.value.trim();
+
+  if (!link) return alert("Please insert a Quizlet link!");
+
+  // ✅ Check if it's a valid Quizlet link
+  const quizletRegex = /^https?:\/\/(www\.)?quizlet\.com\/.+/;
+  if (!quizletRegex.test(link)) {
+    return alert("Please enter a valid Quizlet link!");
+  }
+
+  if (!linkHistory.includes(link)) {
+    linkHistory.unshift(link);
+    localStorage.setItem("quizletLinks", JSON.stringify(linkHistory));
+  }
+
+  startStudy(link);
+};
+
 
   function renderHistory() {
     historyDiv.innerHTML = "";
