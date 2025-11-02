@@ -3,12 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Steph Study - Login</title>
-
-  <!-- Google Sign-In -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-
+  <title>Steph Study - Study & Shoot</title>
+  <link rel="icon" type="image/png" href="https://www.nicepng.com/png/full/241-2419786_steph-curry-shooting-stance-stephen-curry-with-mouthpiece.png" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     body {
       font-family: "Poppins", sans-serif;
@@ -22,20 +20,28 @@
       align-items: center;
       text-align: center;
     }
-    h1 { font-size: 3.5rem; margin-bottom: 20px; }
+    h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
     #g_id_signin { margin-top: 20px; }
+    footer {
+      position: fixed;
+      bottom: 10px;
+      font-size: 0.9rem;
+      color: #333;
+    }
   </style>
+</head>
+<body>
+  <h1>Steph Study</h1>
+  <p>Sign in to start studying and shooting 🏀</p>
+  <div id="g_id_signin"></div>
+  <footer>© 2025 Steph Study</footer>
 
   <script>
-    function handleCredentialResponse(response) {
-      const data = jwt_decode(response.credential);
-      localStorage.setItem("stephUser", JSON.stringify(data)); // store login info
-      document.body.innerHTML = `<h1>Welcome, ${data.name} 👋</h1><p>Loading...</p>`;
-      setTimeout(() => {
-        window.location.href = "main.html";
-      }, 1000);
-    }
-
+    // decode JWT for Google Sign-In
     function jwt_decode(token) {
       const base64Url = token.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -45,6 +51,17 @@
       return JSON.parse(jsonPayload);
     }
 
+    // handle Google login
+    function handleCredentialResponse(response) {
+      const data = jwt_decode(response.credential);
+      localStorage.setItem("stephUser", JSON.stringify(data)); // save user
+      document.body.innerHTML = `<h1>Welcome, ${data.name} 👋</h1><p>Loading...</p>`;
+      setTimeout(() => {
+        window.location.href = "study.html"; // redirect to your existing study interface
+      }, 1500);
+    }
+
+    // setup Google button
     window.onload = function () {
       google.accounts.id.initialize({
         client_id: "329250707921-o46thrivup8avr0rlbngtjnqdthrfgkr.apps.googleusercontent.com",
@@ -56,10 +73,5 @@
       );
     };
   </script>
-</head>
-<body>
-  <h1>Steph Study</h1>
-  <p>Sign in to start studying and shooting 🏀</p>
-  <div id="g_id_signin"></div>
 </body>
 </html>
