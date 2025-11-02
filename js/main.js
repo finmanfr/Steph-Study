@@ -89,6 +89,7 @@ function startGame(link) {
     timeLeft--;
     timer.textContent = `Next Quizlet in: ${timeLeft}s`;
     if (timeLeft <= 0) {
+      console.log("gameover");
       clearInterval(interval);
       startStudy(link);
     }
