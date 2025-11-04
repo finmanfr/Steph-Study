@@ -37,19 +37,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function startStudy(link) {
   // Create layout only once
-  if (!document.getElementById("quizFrame")) {
-    document.body.innerHTML = `
-      <iframe id="quizFrame" src="${link}" style="width:100%;height:100vh;border:none;"></iframe>
-      <iframe id="gameFrame" src="https://basketball-stars.io" 
-              style="width:100%;height:100vh;border:none;display:none;"></iframe>
-      <div id="timerDisplay" style="
-        position: fixed; top: 20px; right: 30px;
-        background: #2563eb; color: white;
-        padding: 8px 14px; border-radius: 8px;
-        font-weight: bold; font-size: 1rem;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        z-index: 1000;">Next game in: 10s</div>
-    `;
+document.body.innerHTML = `
+<iframe id="quizFrame" src="${link}" style="width:100%;height:100vh;border:none;"></iframe>
+
+<iframe id="gameFrame" src="https://basketball-stars.io"
+style="width:100%;height:100vh;border:none;display:none;"></iframe>
+
+<div id="timerDisplay" style="
+position: fixed; top: 20px; right: 30px;
+background: #2563eb; color: white;
+padding: 8px 14px; border-radius: 8px;
+font-weight: bold; font-size: 1rem;
+box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+z-index: 1000;">Next game in: 10s</div>
+<div id="cashDisplay" style="
+position: fixed; top: 60px; right: 30px;
+background: rgba(255,255,255,0.2);
+color: #00ff88;
+padding: 6px 14px;
+border-radius: 8px;
+font-weight: bold;
+font-size: 1rem;
+box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+z-index: 1000;">$--</div>
+`;
+
   }
 
   const quiz = document.getElementById("quizFrame");
