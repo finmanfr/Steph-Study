@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function buildQuizletEmbed(id) {
-    return `https://quizlet.com/${id}/flashcards/embed?i=3va39x&x=1jj1`;
+    return `https://quizlet.com/${id}/test/embed?i=3va39x&x=1jj1`;
   }
 
   function startStudy(id) {
