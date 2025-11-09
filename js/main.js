@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let pressedKeys = new Set();
   let showingBasketball = false;
+  let cash = 0; // 💰 total cash earned
 
   beginBtn.onclick = () => {
     const id = input.value.trim();
@@ -31,6 +32,13 @@ document.addEventListener("DOMContentLoaded", () => {
           font-weight: bold; font-size: 1rem;
           box-shadow: 0 4px 10px rgba(0,0,0,0.2);
           z-index: 1000;">Next game in: 10s</div>
+        <div id="cashDisplay" style="
+          position: fixed; top: 20px; left: 30px;
+          background: #16a34a; color: white;
+          padding: 8px 14px; border-radius: 8px;
+          font-weight: bold; font-size: 1rem;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+          z-index: 1000;">Cash: $0</div>
       `;
     }
 
@@ -51,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
       timer.textContent = `Next game in: ${timeLeft}s`;
       if (timeLeft <= 0) {
         clearInterval(interval);
+        rewardCash(); // 💵 give +10 when study ends
         startGame(id);
       }
     }, 1000);
@@ -61,7 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const game = document.getElementById("gameFrame");
     const timer = document.getElementById("timerDisplay");
 
-    // Show game, hide Quizlet
     quiz.style.display = "none";
     game.style.display = "block";
 
@@ -76,6 +84,35 @@ document.addEventListener("DOMContentLoaded", () => {
         startStudy(id);
       }
     }, 1000);
+  }
+
+  // 💸 Adds +10 and briefly shows "+10$" animation
+  function rewardCash() {
+    cash += 10;
+    const cashDisplay = document.getElementById("cashDisplay");
+    cashDisplay.textContent = `Cash: $${cash}`;
+
+    // floating +10 animation
+    const plus = document.createElement("div");
+    plus.textContent = "+$10";
+    plus.style.position = "fixed";
+    plus.style.left = "50%";
+    plus.style.top = "50%";
+    plus.style.transform = "translate(-50%, -50%)";
+    plus.style.fontSize = "2rem";
+    plus.style.fontWeight = "bold";
+    plus.style.color = "#16a34a";
+    plus.style.opacity = "1";
+    plus.style.transition = "all 1s ease";
+    plus.style.zIndex = "2000";
+    document.body.appendChild(plus);
+
+    setTimeout(() => {
+      plus.style.top = "30%";
+      plus.style.opacity = "0";
+    }, 50);
+
+    setTimeout(() => plus.remove(), 1000);
   }
 
   // 🎮 R + B shortcut
