@@ -1,39 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("quizletLink");
   const beginBtn = document.getElementById("beginBtn");
-  const historyDiv = document.getElementById("history");
 
   let pressedKeys = new Set();
   let showingBasketball = false;
 
-  // Load saved IDs
-  let linkHistory = JSON.parse(localStorage.getItem("quizletLinks") || "[]");
-  renderHistory();
-
   beginBtn.onclick = () => {
     const id = input.value.trim();
     if (!id) return alert("Please insert a Quizlet ID!");
-    if (!linkHistory.includes(id)) {
-      linkHistory.unshift(id);
-      localStorage.setItem("quizletLinks", JSON.stringify(linkHistory));
-    }
     startStudy(id);
   };
-
-  function renderHistory() {
-    historyDiv.innerHTML = "";
-    if (linkHistory.length > 0) {
-      const label = document.createElement("p");
-      label.textContent = "Recent Quizlet IDs:";
-      historyDiv.appendChild(label);
-    }
-    linkHistory.forEach(id => {
-      const btn = document.createElement("button");
-      btn.textContent = id;
-      btn.onclick = () => startStudy(id);
-      historyDiv.appendChild(btn);
-    });
-  }
 
   function buildQuizletEmbed(id) {
     return `https://quizlet.com/${id}/test/embed?i=3va39x&x=1jj1`;
