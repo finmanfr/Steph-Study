@@ -402,7 +402,7 @@ uploadBtn.onclick = async () => {
   const user = JSON.parse(localStorage.getItem("steph_user") || "{}");
 
   const payload = {
-    setName: "67",
+    setName: setName.value,
     folder: uploadFolder.value,
     id: uploadId.value,
     user: user.email || "unknown"
