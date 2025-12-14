@@ -353,98 +353,135 @@
 </style>
 
 <script>
-/* ===== CONFIG ===== */
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbw1gBP1RrbepW0B7zQKO5fG8k8q2bSfYlu6YVGSmpmIzUky2cWTJluZOYjKfldL7F1kKA/exec";
+/* =======================
+   CONFIG
+======================= */
+const SHEET_URL =
+  "https://script.google.com/macros/s/AKfycbw1gBP1RrbepW0B7zQKO5fG8k8q2bSfYlu6YVGSmpmIzUky2cWTJluZOYjKfldL7F1kKA/exec";
 
-/* ===== ELEMENTS ===== */
+/* =======================
+   ELEMENTS
+======================= */
 const panel = document.getElementById("sidePanel");
 const addBtn = document.getElementById("addBtn");
 const exploreBtn = document.getElementById("exploreBtn");
 const uploadBtn = document.getElementById("uploadBtn");
 const exploreView = document.getElementById("exploreView");
 const addView = document.getElementById("addView");
+const actionIcons = document.getElementById("actionIcons");
 
-/* ===== SHOW ICONS AFTER LOGIN ===== */
+/* =======================
+   SHOW ICONS AFTER LOGIN
+======================= */
 function showIcons() {
-  document.getElementById("actionIcons").style.display = "flex";
+  if (actionIcons) actionIcons.style.display = "flex";
 }
 
-/* Hook login safely */
-const _handle = handleCredentialResponse;
-handleCredentialResponse = function(r){
-  _handle(r);
+/* Hook into Google login safely */
+const originalHandle = handleCredentialResponse;
+handleCredentialResponse = function (response) {
+  originalHandle(response);
   showIcons();
 };
 
-window.addEventListener("load", ()=>{
-  if(localStorage.getItem("steph_user")) showIcons();
+window.addEventListener("load", () => {
+  if (localStorage.getItem("steph_user")) {
+    showIcons();
+  }
 });
 
-/* ===== PANEL TOGGLE ===== */
-function togglePanel() {
-  panel.style.right = panel.style.right === "0px" ? "-340px" : "0px";
+/* =======================
+   PANEL TOGGLE
+======================= */
+function openPanel() {
+  panel.style.right = "0px";
+}
+function closePanel() {
+  panel.style.right = "-340px";
 }
 
 addBtn.onclick = () => {
   addView.style.display = "block";
   exploreView.style.display = "none";
-  togglePanel();
+  openPanel();
 };
 
 exploreBtn.onclick = () => {
   addView.style.display = "none";
   exploreView.style.display = "block";
   loadSets();
-  togglePanel();
+  openPanel();
 };
 
-/* ===== UPLOAD TO SHEETS ===== */
+/* =======================
+   UPLOAD TO GOOGLE SHEETS
+======================= */
 uploadBtn.onclick = async () => {
+  const setName = document.getElementById("setName").value.trim();
+  const folder = document.getElementById("uploadFolder").value.trim();
+  const id = document.getElementById("uploadId").value.trim();
   const user = JSON.parse(localStorage.getItem("steph_user") || "{}");
 
-  const payload = {
-    setName: document.getElementById("setName").value.trim(),
-    folder: document.getElementById("uploadFolder").value.trim(),
-    id: document.getElementById("uploadId").value.trim(),
-    user: user.email || "unknown"
-  };
-
-  if (!payload.setName || !payload.folder || !payload.id) {
+  if (!setName || !folder || !id) {
     alert("Fill out all fields");
     return;
   }
 
-  await fetch(SHEET_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-  });
+  const payload = {
+    setName,
+    folder,
+    id,
+    user: user.email || "unknown",
+  };
 
-  alert("Uploaded!");
-  panel.style.right = "-340px";
+  try {
+    const res = await fetch(SHEET_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const text = await res.text();
+    console.log("Upload response:", text);
+
+    alert("Uploaded successfully!");
+    closePanel();
+
+    document.getElementById("setName").value = "";
+    document.getElementById("uploadFolder").value = "";
+    document.getElementById("uploadId").value = "";
+  } catch (err) {
+    console.error(err);
+    alert("Upload failed. Check console.");
+  }
 };
 
-
-/* ===== LOAD SETS ===== */
+/* =======================
+   LOAD SETS (EXPLORE)
+======================= */
 async function loadSets() {
   exploreView.innerHTML = "Loading...";
-  const res = await fetch(SHEET_URL);
-  const sets = await res.json();
 
-  exploreView.innerHTML = "";
-  sets.forEach(row => {
-    const div = document.createElement("div");
-    div.innerText = row[0];
-    div.onclick = () => {
-      document.getElementById("quizletLink").value = row[2];
-      panel.style.right = "-340px";
-    };
-    exploreView.appendChild(div);
-  });
+  try {
+    const res = await fetch(SHEET_URL);
+    const sets = await res.json();
+
+    exploreView.innerHTML = "";
+
+    sets.forEach((row) => {
+      const div = document.createElement("div");
+      div.textContent = row[0]; // set name
+
+      div.onclick = () => {
+        document.getElementById("quizletLink").value = row[2]; // ID
+        closePanel();
+      };
+
+      exploreView.appendChild(div);
+    });
+  } catch (err) {
+    exploreView.innerHTML = "Failed to load sets";
+    console.error(err);
+  }
 }
 </script>
-
-</body>
-</html>
