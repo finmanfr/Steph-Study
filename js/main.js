@@ -1,14 +1,27 @@
 document.addEventListener("DOMContentLoaded", () => {
+  
   const input = document.getElementById("quizletLink");
   const beginBtn = document.getElementById("beginBtn");
 
   let quizletLoaded = false;
+let selectedMode = "basketball"; // default keeps current behavior
 
 
   let pressedKeys = new Set();
   let showingBasketball = false;
   let cash = 0; // 💰 total cash earned
 
+const modeSelect = document.getElementById("modeSelect");
+
+if (modeSelect) {
+  selectedMode = modeSelect.value;
+
+  modeSelect.addEventListener("change", (e) => {
+    selectedMode = e.target.value;
+  });
+}
+
+  
   beginBtn.onclick = () => {
     const id = input.value.trim();
     if (!id) return alert("Please insert a Quizlet ID!");
@@ -75,7 +88,9 @@ game.style.display = "none";
       if (timeLeft <= 0) {
         clearInterval(interval);
         rewardCash(); // 💵 give +10 when study ends
+        if (selectedMode === "basketball") {
         startGame(id);
+        }
       }
     }, 1000);
   }
