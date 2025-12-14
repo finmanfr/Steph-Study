@@ -407,38 +407,26 @@ uploadBtn.onclick = async () => {
   const user = JSON.parse(localStorage.getItem("steph_user") || "{}");
 
   const payload = {
-    setName: setName.value,
-    folder: uploadFolder.value,
-    id: uploadId.value,
+    setName: document.getElementById("setName").value,
+    folder: document.getElementById("uploadFolder").value,
+    id: document.getElementById("uploadId").value,
     user: user.email || "unknown"
   };
 
+  console.log("Uploading payload:", payload);
+
   await fetch(SHEET_URL, {
     method: "POST",
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
+    headers: {
+      "Content-Type": "application/json"
+    }
   });
 
   alert("Uploaded!");
   panel.style.right = "-340px";
 };
 
-/* ===== LOAD SETS ===== */
-async function loadSets() {
-  exploreView.innerHTML = "Loading...";
-  const res = await fetch(SHEET_URL);
-  const sets = await res.json();
-
-  exploreView.innerHTML = "";
-  sets.forEach(row => {
-    const div = document.createElement("div");
-    div.innerText = row[0];
-    div.onclick = () => {
-      document.getElementById("quizletLink").value = row[2];
-      panel.style.right = "-340px";
-    };
-    exploreView.appendChild(div);
-  });
-}
 </script>
 
 </body>
