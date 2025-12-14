@@ -164,3 +164,40 @@ iframe {
   border: none;
   border-radius: 0;
 }
+#actionIcons {
+position: fixed;
+top: 12px;
+right: 100px;
+display: none;
+gap: 10px;
+z-index: 1500;
+}
+
+#actionIcons div {
+width: 42px;
+height: 42px;
+border-radius: 50%;
+background: #00ff88;
+color: #000;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 1.4rem;
+font-weight: 800;
+cursor: pointer;
+box-shadow: 0 0 10px rgba(0,0,0,0.25);
+}
+
+#sidePanel {
+position: fixed;
+right: -340px;
+top: 0;
+width: 320px;
+height: 100vh;
+background: #fff;
+padding: 20px;
+transition: right 0.3s ease;
+z-index: 2000;
+box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+}
+
