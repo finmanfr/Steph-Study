@@ -52,14 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const timer = document.getElementById("timerDisplay");
 
     // Show Quizlet, hide game
-if (!quizLoaded) {
-  quiz.src = link;
-  quizLoaded = true;
-}
-
-quiz.style.display = "block";
-game.style.display = "none";
-
+    quiz.src = link;
+    quiz.style.display = "block";
+    game.style.display = "none";
 
     let timeLeft = 20;
     timer.textContent = `Next game in: ${timeLeft}s`;
