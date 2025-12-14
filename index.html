@@ -171,6 +171,10 @@
   <!-- NAVBAR -->
   <!-- Add / Explore floating icons -->
 
+<div id="actionIcons">
+  <div id="addBtn" title="Add Set">＋</div>
+  <div id="exploreBtn" title="Explore Sets">🔍</div>
+</div>
 
 <!-- Side Panel -->
 
@@ -191,11 +195,6 @@
     <h2>Steph Study</h2>
     <div id="cashDisplay">$--</div>
     <div id="profileCircle"><img id="profileImg" src="" alt="Profile" /></div>
-    <div id="actionIcons">
-  <div id="addBtn" title="Add Set">＋</div>
-  <div id="exploreBtn" title="Explore Sets">🔍</div>
-</div>
-
   </nav>
 
   <h1>Steph Study</h1>
@@ -288,7 +287,11 @@
   </script>
 
   <script src="js/main.js"></script>
-
+  <!-- ================== ADD / EXPLORE UI ================== -->
+<div id="actionIcons">
+  <div id="addBtn">＋</div>
+  <div id="exploreBtn">🔍</div>
+</div>
 
 <div id="sidePanel">
   <h3 id="panelTitle">Add Set</h3>
@@ -353,135 +356,89 @@
 </style>
 
 <script>
-/* =======================
-   CONFIG
-======================= */
-const SHEET_URL =
-  "https://script.google.com/macros/s/AKfycbyOw_TqkbBlhxM6i1941kRDElnrCa1KYVbotuirqgWyXx8JO1OduDIwupXkS_F9h6b1Dg/exec";
+/* ===== CONFIG ===== */
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbw1gBP1RrbepW0B7zQKO5fG8k8q2bSfYlu6YVGSmpmIzUky2cWTJluZOYjKfldL7F1kKA/exec";
 
-/* =======================
-   ELEMENTS
-======================= */
+/* ===== ELEMENTS ===== */
 const panel = document.getElementById("sidePanel");
 const addBtn = document.getElementById("addBtn");
 const exploreBtn = document.getElementById("exploreBtn");
 const uploadBtn = document.getElementById("uploadBtn");
 const exploreView = document.getElementById("exploreView");
 const addView = document.getElementById("addView");
-const actionIcons = document.getElementById("actionIcons");
 
-/* =======================
-   SHOW ICONS AFTER LOGIN
-======================= */
+/* ===== SHOW ICONS AFTER LOGIN ===== */
 function showIcons() {
-  if (actionIcons) actionIcons.style.display = "flex";
+  document.getElementById("actionIcons").style.display = "flex";
 }
 
-/* Hook into Google login safely */
-const originalHandle = handleCredentialResponse;
-handleCredentialResponse = function (response) {
-  originalHandle(response);
+/* Hook login safely */
+const _handle = handleCredentialResponse;
+handleCredentialResponse = function(r){
+  _handle(r);
   showIcons();
 };
 
-window.addEventListener("load", () => {
-  if (localStorage.getItem("steph_user")) {
-    showIcons();
-  }
+window.addEventListener("load", ()=>{
+  if(localStorage.getItem("steph_user")) showIcons();
 });
 
-/* =======================
-   PANEL TOGGLE
-======================= */
-function openPanel() {
-  panel.style.right = "0px";
-}
-function closePanel() {
-  panel.style.right = "-340px";
+/* ===== PANEL TOGGLE ===== */
+function togglePanel() {
+  panel.style.right = panel.style.right === "0px" ? "-340px" : "0px";
 }
 
 addBtn.onclick = () => {
   addView.style.display = "block";
   exploreView.style.display = "none";
-  openPanel();
+  togglePanel();
 };
 
 exploreBtn.onclick = () => {
   addView.style.display = "none";
   exploreView.style.display = "block";
   loadSets();
-  openPanel();
+  togglePanel();
 };
 
-/* =======================
-   UPLOAD TO GOOGLE SHEETS
-======================= */
+/* ===== UPLOAD TO SHEETS ===== */
 uploadBtn.onclick = async () => {
-  const setName = document.getElementById("setName").value.trim();
-  const folder = document.getElementById("uploadFolder").value.trim();
-  const id = document.getElementById("uploadId").value.trim();
   const user = JSON.parse(localStorage.getItem("steph_user") || "{}");
 
-  if (!setName || !folder || !id) {
-    alert("Fill out all fields");
-    return;
-  }
-
   const payload = {
-    setName,
-    folder,
-    id,
-    user: user.email || "unknown",
+    setName: setName.value,
+    folder: uploadFolder.value,
+    id: uploadId.value,
+    user: user.email || "unknown"
   };
 
-  try {
-    const res = await fetch(SHEET_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+  await fetch(SHEET_URL, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
 
-    const text = await res.text();
-    console.log("Upload response:", text);
-
-    alert("Uploaded successfully!");
-    closePanel();
-
-    document.getElementById("setName").value = "";
-    document.getElementById("uploadFolder").value = "";
-    document.getElementById("uploadId").value = "";
-  } catch (err) {
-    console.error(err);
-    alert("Upload failed. Check console.");
-  }
+  alert("Uploaded!");
+  panel.style.right = "-340px";
 };
 
-/* =======================
-   LOAD SETS (EXPLORE)
-======================= */
+/* ===== LOAD SETS ===== */
 async function loadSets() {
   exploreView.innerHTML = "Loading...";
+  const res = await fetch(SHEET_URL);
+  const sets = await res.json();
 
-  try {
-    const res = await fetch(SHEET_URL);
-    const sets = await res.json();
-
-    exploreView.innerHTML = "";
-
-    sets.forEach((row) => {
-      const div = document.createElement("div");
-      div.textContent = row[0]; // set name
-
-      div.onclick = () => {
-        document.getElementById("quizletLink").value = row[2]; // ID
-        closePanel();
-      };
-
-      exploreView.appendChild(div);
-    });
-  } catch (err) {
-    exploreView.innerHTML = "Failed to load sets";
-    console.error(err);
-  }
+  exploreView.innerHTML = "";
+  sets.forEach(row => {
+    const div = document.createElement("div");
+    div.innerText = row[0];
+    div.onclick = () => {
+      document.getElementById("quizletLink").value = row[2];
+      panel.style.right = "-340px";
+    };
+    exploreView.appendChild(div);
+  });
 }
 </script>
+
+</body>
+</html>
