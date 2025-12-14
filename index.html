@@ -339,6 +339,10 @@
   z-index: 2000;
 }
 
+  #sidePanel.open {
+  transform: translateX(0);
+}
+
 
 #sidePanel input {
   width: 100%;
@@ -387,8 +391,9 @@ window.addEventListener("load", ()=>{
 
 /* ===== PANEL TOGGLE ===== */
 function togglePanel() {
-  panel.style.right = panel.style.right === "0px" ? "-340px" : "0px";
+  panel.classList.toggle("open");
 }
+
 
 addBtn.onclick = () => {
   addView.style.display = "block";
