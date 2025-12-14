@@ -59,6 +59,17 @@
       border-radius: 10px;
     }
 
+    #topRightIcons {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;   /* controls how close they are */
+}
+
+
     /* Profile Circle in Navbar */
     #profileCircle {
       width: 45px;
@@ -189,12 +200,15 @@
 
   <nav>
     <h2>Steph Study</h2>
-    <div id="cashDisplay">$--</div>
-  <div id="actionIcons">
-    <div id="addBtn">＋</div>
-    <div id="exploreBtn">🔍</div>
+   <div id="topRightIcons">
+  <div id="cash">$--</div>
+  <div id="addBtn">＋</div>
+  <div id="exploreBtn">🔍</div>
+
+  <div id="profileCircle">
+    <img id="profileImg" />
+    <div id="logoutMenu">Logout</div>
   </div>
-    <div id="profileCircle"><img id="profileImg" src="" alt="Profile" /></div>
 </div>
 
   </nav>
