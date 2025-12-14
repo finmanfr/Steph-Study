@@ -280,13 +280,16 @@
         logoutMenu.style.display === "block" ? "none" : "block";
     });
 
-    logoutMenu.addEventListener("click", () => {
-      localStorage.removeItem("steph_user");
-      google.accounts.id.disableAutoSelect();
-      location.reload();
-    });
- <script>
+logoutMenu.addEventListener("click", () => {
+  localStorage.removeItem("steph_user");
+  google.accounts.id.disableAutoSelect();
+  location.reload();
+});
+</script>
+
+<script>
 /* ================== ADD / EXPLORE / UPLOAD SCRIPT (FIXED) ================== */
+
 
 /* ===== CONFIG ===== */
 const SHEET_URL =
