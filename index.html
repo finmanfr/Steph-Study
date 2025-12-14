@@ -425,7 +425,7 @@ uploadBtn.onclick = async () => {
   });
 
   alert("Uploaded!");
-  panel.style.right = "-340px";
+   togglePanel();
 };
 
 /* ===== LOAD SETS ===== */
@@ -440,7 +440,7 @@ async function loadSets() {
     div.innerText = row[0];
     div.onclick = () => {
       document.getElementById("quizletLink").value = row[2];
-      panel.style.right = "-340px";
+       togglePanel();
     };
     exploreView.appendChild(div);
   });
