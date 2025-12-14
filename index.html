@@ -14,6 +14,31 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
+
+    /* ===== MODE SELECTOR (Bottom Right) ===== */
+.mode-selector {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 9999;
+}
+
+.mode-selector select {
+  font-family: "Poppins", sans-serif;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+}
+
+.mode-selector select:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
     body {
       font-family: "Poppins", sans-serif;
       background: #00b3ff url('https://openclipart.org/image/800px/308970') no-repeat center center fixed;
@@ -197,6 +222,12 @@
     }
   </style>
 </head>
+<div class="mode-selector">
+  <select id="modeSelect">
+    <option value="quizlet">📚 Regular Quizlet</option>
+    <option value="basketball">🏀 Basketball Game</option>
+  </select>
+</div>
 
 <body>
   <!-- NAVBAR -->
