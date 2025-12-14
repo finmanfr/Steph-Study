@@ -285,149 +285,78 @@
       google.accounts.id.disableAutoSelect();
       location.reload();
     });
-  </script>
+ <script>
+/* ================== ADD / EXPLORE / UPLOAD SCRIPT (FIXED) ================== */
 
-  <script src="js/main.js"></script>
-  <!-- ================== ADD / EXPLORE UI ================== -->
-<div id="actionIcons">
-  <div id="addBtn">＋</div>
-  <div id="exploreBtn">🔍</div>
-</div>
-
-<div id="sidePanel">
-  <h3 id="panelTitle">Add Set</h3>
-
-  <div id="addView">
-    <input id="setName" placeholder="Set Name">
-    <input id="uploadFolder" placeholder="Folder">
-    <input id="uploadId" placeholder="Set ID">
-    <button id="uploadBtn">Upload</button>
-  </div>
-
-  <div id="exploreView" style="display:none;"></div>
-</div>
-
-<style>
-#actionIcons {
-  display: none;
-  gap: 10px;
-}
-
-#actionIcons div {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #00ff88;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-#sidePanel {
-  position: fixed;
-  right: -340px;
-  top: 0;
-  width: 320px;
-  height: 100vh;
-  background: white;
-  padding: 20px;
-  transition: right 0.3s;
-  z-index: 2000;
-  box-shadow: -5px 0 15px rgba(0,0,0,0.2);
-}
-
-#sidePanel input {
-  width: 100%;
-  margin-bottom: 12px;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-}
-
-#exploreView div {
-  padding: 10px;
-  margin-bottom: 8px;
-  background: #f1f5f9;
-  border-radius: 8px;
-  cursor: pointer;
-}
-</style>
-
-<script>
 /* ===== CONFIG ===== */
-const SHEET_URL = "https://script.google.com/macros/s/AKfycby729Y4jkv2y3qqNn85CeYV2wm_JQ1aCrQPcgDRs22nSBNMKadM06fGx2al74m4FxpvDQ/exec";
+const SHEET_URL =
+  "https://script.google.com/macros/s/AKfycby729Y4jkv2y3qqNn85CeYV2wm_JQ1aCrQPcgDRs22nSBNMKadM06fGx2al74m4FxpvDQ/exec";
 
-/* ===== ELEMENTS ===== */
-const panel = document.getElementById("sidePanel");
-const addBtn = document.getElementById("addBtn");
-const exploreBtn = document.getElementById("exploreBtn");
-const uploadBtn = document.getElementById("uploadBtn");
-const exploreView = document.getElementById("exploreView");
-const addView = document.getElementById("addView");
+/* ===== RUN AFTER DOM LOAD ===== */
+window.addEventListener("DOMContentLoaded", () => {
+  /* ===== ELEMENTS ===== */
+  const panel = document.getElementById("sidePanel");
+  const addBtn = document.getElementById("addBtn");
+  const exploreBtn = document.getElementById("exploreBtn");
+  const uploadBtn = document.getElementById("uploadBtn");
+  const exploreView = document.getElementById("exploreView");
+  const addView = document.getElementById("addView");
+  const actionIcons = document.getElementById("actionIcons");
 
-/* ===== SHOW ICONS AFTER LOGIN ===== */
-function showIcons() {
-  document.getElementById("actionIcons").style.display = "flex";
-}
+  /* ===== SHOW ICONS AFTER LOGIN ===== */
+  function showIcons() {
+    if (actionIcons) actionIcons.style.display = "flex";
+  }
 
-/* Hook login safely */
-const _handle = handleCredentialResponse;
-handleCredentialResponse = function(r){
-  _handle(r);
-  showIcons();
-};
+  if (localStorage.getItem("steph_user")) showIcons();
 
-window.addEventListener("load", ()=>{
-  if(localStorage.getItem("steph_user")) showIcons();
-});
+  /* ===== PANEL TOGGLE ===== */
+  function togglePanel() {
+    panel.style.right = panel.style.right === "0px" ? "-340px" : "0px";
+  }
 
-/* ===== PANEL TOGGLE ===== */
-function togglePanel() {
-  panel.style.right = panel.style.right === "0px" ? "-340px" : "0px";
-}
-
-addBtn.onclick = () => {
-  addView.style.display = "block";
-  exploreView.style.display = "none";
-  togglePanel();
-};
-
-exploreBtn.onclick = () => {
-  addView.style.display = "none";
-  exploreView.style.display = "block";
-  loadSets();
-  togglePanel();
-};
-
-/* ===== UPLOAD TO SHEETS ===== */
-uploadBtn.onclick = async () => {
-  const user = JSON.parse(localStorage.getItem("steph_user") || "{}");
-
-  const payload = {
-    setName: document.getElementById("setName").value,
-    folder: document.getElementById("uploadFolder").value,
-    id: document.getElementById("uploadId").value,
-    user: user.email || "unknown"
+  /* ===== BUTTON HANDLERS ===== */
+  addBtn.onclick = () => {
+    addView.style.display = "block";
+    exploreView.style.display = "none";
+    togglePanel();
   };
 
-  console.log("Uploading payload:", payload);
+  exploreBtn.onclick = () => {
+    addView.style.display = "none";
+    exploreView.style.display = "block";
+    if (typeof loadSets === "function") loadSets();
+    togglePanel();
+  };
 
-  await fetch(SHEET_URL, {
-    method: "POST",
-    body: JSON.stringify(payload),
-    headers: {
-      "Content-Type": "application/json"
+  /* ===== UPLOAD TO GOOGLE SHEETS ===== */
+  uploadBtn.onclick = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("steph_user") || "{}");
+
+      const payload = {
+        setName: document.getElementById("setName").value.trim(),
+        folder: document.getElementById("uploadFolder").value.trim(),
+        id: document.getElementById("uploadId").value.trim(),
+        user: user.email || "unknown"
+      };
+
+      console.log("Uploading payload:", payload);
+
+      await fetch(SHEET_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      alert("Uploaded!");
+      panel.style.right = "-340px";
+    } catch (err) {
+      console.error("Upload failed:", err);
+      alert("Upload failed. Check console.");
     }
-  });
-
-  alert("Uploaded!");
-  panel.style.right = "-340px";
-};
-
+  };
+});
 </script>
-
 </body>
 </html>
