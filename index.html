@@ -403,20 +403,29 @@ uploadBtn.onclick = async () => {
   const user = JSON.parse(localStorage.getItem("steph_user") || "{}");
 
   const payload = {
-    setName: setName.value,
-    folder: uploadFolder.value,
-    id: uploadId.value,
+    setName: document.getElementById("setName").value.trim(),
+    folder: document.getElementById("uploadFolder").value.trim(),
+    id: document.getElementById("uploadId").value.trim(),
     user: user.email || "unknown"
   };
 
+  if (!payload.setName || !payload.folder || !payload.id) {
+    alert("Fill out all fields");
+    return;
+  }
+
   await fetch(SHEET_URL, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify(payload)
   });
 
   alert("Uploaded!");
   panel.style.right = "-340px";
 };
+
 
 /* ===== LOAD SETS ===== */
 async function loadSets() {
