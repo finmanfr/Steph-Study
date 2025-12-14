@@ -57,12 +57,8 @@ if (!quizLoaded) {
   quizLoaded = true;
 }
 
-quiz.style.visibility = "visible";
-quiz.style.pointerEvents = "auto";
-
-game.style.visibility = "hidden";
-game.style.pointerEvents = "none";
-
+quiz.style.display = "block";
+game.style.display = "none";
 
 
     let timeLeft = 20;
@@ -84,12 +80,8 @@ game.style.pointerEvents = "none";
     const game = document.getElementById("gameFrame");
     const timer = document.getElementById("timerDisplay");
 
-quiz.style.visibility = "hidden";
-quiz.style.pointerEvents = "none";
-
-game.style.visibility = "visible";
-game.style.pointerEvents = "auto";
-
+    quiz.style.display = "none";
+    game.style.display = "block";
 
     let timeLeft = 20;
     timer.textContent = `Next Quizlet in: ${timeLeft}s`;
