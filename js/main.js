@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("quizletLink");
   const beginBtn = document.getElementById("beginBtn");
 
+  let quizletLoaded = false;
+
+
   let pressedKeys = new Set();
   let showingBasketball = false;
   let cash = 0; // 💰 total cash earned
@@ -52,9 +55,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const timer = document.getElementById("timerDisplay");
 
     // Show Quizlet, hide game
-    quiz.src = link;
-    quiz.style.display = "block";
-    game.style.display = "none";
+   // Load Quizlet ONLY once
+if (!quizletLoaded) {
+  quiz.src = link;
+  quizletLoaded = true;
+}
+
+// Show Quizlet, hide game (no reload)
+quiz.style.display = "block";
+game.style.display = "none";
+
 
     let timeLeft = 20;
     timer.textContent = `Next game in: ${timeLeft}s`;
