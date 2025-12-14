@@ -60,14 +60,25 @@
     }
 
     #topRightIcons {
-  position: absolute;
-  top: 12px;
-  right: 16px;
+  display: none; /* hidden by default */
+}
 
+#topRightIcons > div:not(#profileCircle) {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #fbff00;
+  color: #111;
   display: flex;
   align-items: center;
-  gap: 10px;   /* controls how close they are */
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 800;
+  cursor: pointer;
 }
+
+
+    
 
 
     /* Profile Circle in Navbar */
@@ -260,6 +271,7 @@
       const profileImg = document.getElementById("profileImg");
       profileImg.src = data.picture;
       profileCircle.style.display = "block";
+document.getElementById("topRightIcons").style.display = "flex";
 
       localStorage.setItem("steph_user", JSON.stringify(data));
     }
@@ -270,6 +282,7 @@
         const data = JSON.parse(saved);
         document.getElementById("welcomeText").innerText = `Welcome back, ${data.name} 👋`;
         document.getElementById("g_id_signin").style.display = "none";
+        document.getElementById("topRightIcons").style.display = "flex";
         document.getElementById("inputContainer").style.display = "flex";
         document.getElementById("profileImg").src = data.picture;
         document.getElementById("profileCircle").style.display = "block";
