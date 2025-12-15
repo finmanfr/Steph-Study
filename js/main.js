@@ -41,22 +41,31 @@ if (modeSelect) {
   }
 };
 
-  function loadQuizletOnly(id) {
+ function loadQuizletOnly(id) {
   const link = buildQuizletEmbed(id);
 
-  // Create fullscreen layout once
+  // Create layout ONCE
   if (!document.getElementById("quizFrame")) {
     document.body.innerHTML = `
       <iframe
         id="quizFrame"
-        src="${link}"
         style="width:100%;height:100vh;border:none;"
       ></iframe>
     `;
   }
 
-  quizletLoaded = true;
+  const quiz = document.getElementById("quizFrame");
+
+  // Load Quizlet ONLY once
+  if (!quizletLoaded) {
+    quiz.src = link;
+    quizletLoaded = true;
+  }
+
+  // Always show it fullscreen
+  quiz.style.display = "block";
 }
+
 
 
 
