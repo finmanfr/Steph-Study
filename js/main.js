@@ -37,34 +37,11 @@ if (modeSelect) {
     // (your existing basketball logic is already inside startStudy / later flow)
   } else {
     // 📚 QUIZLET ONLY MODE — NO SWITCHING
-    loadQuizletOnly(id);
+    startStudy(id);
   }
 };
 
- function loadQuizletOnly(id) {
-  const link = buildQuizletEmbed(id);
-
-  // Create layout ONCE
-  if (!document.getElementById("quizFrame")) {
-    document.body.innerHTML = `
-      <iframe
-        id="quizFrame"
-        style="width:100%;height:100vh;border:none;"
-      ></iframe>
-    `;
-  }
-
-  const quiz = document.getElementById("quizFrame");
-
-  // Load Quizlet ONLY once
-  if (!quizletLoaded) {
-    quiz.src = link;
-    quizletLoaded = true;
-  }
-
-  // Always show it fullscreen
-  quiz.style.display = "block";
-}
+ 
 
 
 
@@ -73,6 +50,7 @@ if (modeSelect) {
     return `https://quizlet.com/${id}/test/embed?i=3va39x&x=1jj1`;
   }
 
+  
   function startStudy(id) {
     const link = buildQuizletEmbed(id);
 
@@ -139,6 +117,8 @@ game.style.display = "none";
       }
     }, 1000);
   }
+
+  
 
   function startGame(id) {
     const quiz = document.getElementById("quizFrame");
