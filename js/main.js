@@ -4,22 +4,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const beginBtn = document.getElementById("beginBtn");
 
   let quizletLoaded = false;
-let selectedMode = "basketball"; // default keeps current behavior
+
 
 
   let pressedKeys = new Set();
   let showingBasketball = false;
   let cash = 0; // 💰 total cash earned
 
+let selectedMode = "quizlet"; //️ // default matches HTML first option
+
 const modeSelect = document.getElementById("modeSelect");
 
 if (modeSelect) {
-  selectedMode = modeSelect.value;
+  selectedMode = modeSelect.value; // read initial value
 
-  modeSelect.addEventListener("change", (e) => {
-    selectedMode = e.target.value;
+  modeSelect.addEventListener("change", () => {
+    selectedMode = modeSelect.value;
+    console.log("Mode changed to:", selectedMode);
   });
 }
+
 
   
   beginBtn.onclick = () => {
