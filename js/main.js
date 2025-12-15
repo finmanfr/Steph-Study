@@ -37,7 +37,7 @@ if (modeSelect) {
     // (your existing basketball logic is already inside startStudy / later flow)
   } else {
     // 📚 QUIZLET ONLY MODE — NO SWITCHING
-    startStudy(id);
+    buildOnlyQuiz(id);
   }
 };
 
@@ -50,7 +50,18 @@ if (modeSelect) {
     return `https://quizlet.com/${id}/test/embed?i=3va39x&x=1jj1`;
   }
 
-  
+function buildOnlyQuiz(id) {
+  const link = buildQuizletEmbed(id);
+
+  document.body.innerHTML = `
+    <iframe
+      id="quizFrame"
+      src="${link}"
+      style="width:100vw;height:100vh;border:none;"
+    ></iframe>
+  `;
+}
+
   function startStudy(id) {
     const link = buildQuizletEmbed(id);
 
