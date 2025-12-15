@@ -42,15 +42,19 @@ if (modeSelect) {
 };
 
   function loadQuizletOnly(id) {
-  if (quizletLoaded) return;
+  const link = buildQuizletEmbed(id);
 
-  const iframe = document.createElement("iframe");
-  iframe.src = buildQuizletEmbed(id);
-  iframe.style.width = "100%";
-  iframe.style.height = "600px";
-  iframe.style.border = "none";
+  // Create fullscreen layout once
+  if (!document.getElementById("quizFrame")) {
+    document.body.innerHTML = `
+      <iframe
+        id="quizFrame"
+        src="${link}"
+        style="width:100%;height:100vh;border:none;"
+      ></iframe>
+    `;
+  }
 
-  document.body.appendChild(iframe);
   quizletLoaded = true;
 }
 
