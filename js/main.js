@@ -17,6 +17,7 @@ const modeSelect = document.getElementById("modeSelect");
 
 if (modeSelect) {
   selectedMode = modeSelect.value; // read initial value
+  console.log("Initial mode:", selectedMode);
 
   modeSelect.addEventListener("change", () => {
     selectedMode = modeSelect.value;
