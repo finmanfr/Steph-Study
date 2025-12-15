@@ -26,11 +26,34 @@ if (modeSelect) {
 
 
   
-  beginBtn.onclick = () => {
-    const id = input.value.trim();
-    if (!id) return alert("Please insert a Quizlet ID!");
-    startStudy(id);
-  };
+ beginBtn.onclick = () => {
+  const id = input.value.trim();
+  if (!id) return alert("Please insert a Quizlet ID!");
+
+  if (selectedMode === "basketball") {
+    // 🏀 GAME MODE — do EXACTLY what you already do for basketball
+    startStudy(id); 
+    // (your existing basketball logic is already inside startStudy / later flow)
+  } else {
+    // 📚 QUIZLET ONLY MODE — NO SWITCHING
+    loadQuizletOnly(id);
+  }
+};
+
+  function loadQuizletOnly(id) {
+  if (quizletLoaded) return;
+
+  const iframe = document.createElement("iframe");
+  iframe.src = buildQuizletEmbed(id);
+  iframe.style.width = "100%";
+  iframe.style.height = "600px";
+  iframe.style.border = "none";
+
+  document.body.appendChild(iframe);
+  quizletLoaded = true;
+}
+
+
 
   function buildQuizletEmbed(id) {
     return `https://quizlet.com/${id}/test/embed?i=3va39x&x=1jj1`;
