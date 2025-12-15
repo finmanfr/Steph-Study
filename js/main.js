@@ -80,7 +80,11 @@ game.style.display = "none";
 
 
     let timeLeft = 20;
-    timer.textContent = `Next game in: ${timeLeft}s`;
+    timer.textContent =
+  selectedMode === "basketball"
+    ? `Next game in: ${timeLeft}s`
+    : `Study time left: ${timeLeft}s`;
+
 
     const interval = setInterval(() => {
       timeLeft--;
