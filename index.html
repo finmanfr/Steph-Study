@@ -299,22 +299,35 @@
       return JSON.parse(jsonPayload);
     }
 
-    function handleCredentialResponse(response) {
-      const data = jwt_decode(response.credential);
-      console.log("Logged in as:", data.name, data.email);
+   function handleCredentialResponse(response) {
+  const data = jwt_decode(response.credential);
+  console.log("Logged in as:", data.name, data.email);
 
-      document.getElementById("welcomeText").innerText = `Welcome, ${data.name} 👋`;
-      document.getElementById("g_id_signin").style.display = "none";
-      document.getElementById("inputContainer").style.display = "flex";
+  // 🔥 ADD THIS RIGHT HERE 🔥
+  fetch("https://script.google.com/macros/s/AKfycbzro6fnSAS0Ag0BsD038rOurSpXeDz99sLK25aeqA8zjwtq2FnR7f3S4SiyJvQ_xJ3Z6Q/exec", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    email: data.email
+  })
+});
 
-      const profileCircle = document.getElementById("profileCircle");
-      const profileImg = document.getElementById("profileImg");
-      profileImg.src = data.picture;
-      profileCircle.style.display = "block";
-document.getElementById("topRightIcons").style.display = "flex";
 
-      localStorage.setItem("steph_user", JSON.stringify(data));
-    }
+  document.getElementById("welcomeText").innerText = `Welcome, ${data.name} 👋`;
+  document.getElementById("g_id_signin").style.display = "none";
+  document.getElementById("inputContainer").style.display = "flex";
+
+  const profileCircle = document.getElementById("profileCircle");
+  const profileImg = document.getElementById("profileImg");
+  profileImg.src = data.picture;
+  profileCircle.style.display = "block";
+  document.getElementById("topRightIcons").style.display = "flex";
+
+  localStorage.setItem("steph_user", JSON.stringify(data));
+}
+
 
     window.onload = function () {
       const saved = localStorage.getItem("steph_user");
