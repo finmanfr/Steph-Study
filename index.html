@@ -299,28 +299,10 @@
       return JSON.parse(jsonPayload);
     }
 
-function logToSheet(email) {
-  fetch("https://script.google.com/macros/s/AKfycbyG1QhIobtrrovMcCTO_TfS49qcx7ILfss7MGqmUu9l2eZD1x3VtFH71FeTmMSNcnJvPw/exec", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email })
-  })
-  .then(res => res.text())
-  .then(txt => console.log("Sheet:", txt))
-  .catch(err => console.error(err));
-}
-
-
-
     function handleCredentialResponse(response) {
-      
       const data = jwt_decode(response.credential);
       console.log("Logged in as:", data.name, data.email);
 
-      logToSheet(data.email);
-
-
-      
       document.getElementById("welcomeText").innerText = `Welcome, ${data.name} 👋`;
       document.getElementById("g_id_signin").style.display = "none";
       document.getElementById("inputContainer").style.display = "flex";
@@ -334,36 +316,28 @@ document.getElementById("topRightIcons").style.display = "flex";
       localStorage.setItem("steph_user", JSON.stringify(data));
     }
 
-  window.onload = function () {
-  const saved = localStorage.getItem("steph_user");
+    window.onload = function () {
+      const saved = localStorage.getItem("steph_user");
+      if (saved) {
+        const data = JSON.parse(saved);
+        document.getElementById("welcomeText").innerText = `Welcome back, ${data.name} 👋`;
+        document.getElementById("g_id_signin").style.display = "none";
+        document.getElementById("topRightIcons").style.display = "flex";
+        document.getElementById("inputContainer").style.display = "flex";
+        document.getElementById("profileImg").src = data.picture;
+        document.getElementById("profileCircle").style.display = "block";
+      }
 
-  if (saved) {
-    const data = JSON.parse(saved);
-
-    // 🔥 COUNT EVERY OPEN
-    logToSheet(data.email);
-
-    document.getElementById("welcomeText").innerText =
-      `Welcome back, ${data.name} 👋`;
-
-    document.getElementById("g_id_signin").style.display = "none";
-    document.getElementById("topRightIcons").style.display = "flex";
-    document.getElementById("inputContainer").style.display = "flex";
-    document.getElementById("profileImg").src = data.picture;
-    document.getElementById("profileCircle").style.display = "block";
-  }
-
-  google.accounts.id.initialize({
-    client_id: "YOUR_CLIENT_ID",
-    callback: handleCredentialResponse
-  });
-
-  google.accounts.id.renderButton(
-    document.getElementById("g_id_signin"),
-    { theme: "filled_blue", size: "large", width: 250 }
-  );
-};
-
+      google.accounts.id.initialize({
+        client_id: "329250707921-o46thrivup8avr0rlbngtjnqdthrfgkr.apps.googleusercontent.com",
+        callback: handleCredentialResponse,
+      });
+      google.accounts.id.renderButton(document.getElementById("g_id_signin"), {
+        theme: "filled_blue",
+        size: "large",
+        width: 250,
+      });
+    };
 
     // Profile click → toggle logout
     const profileCircle = document.getElementById("profileCircle");
@@ -483,17 +457,6 @@ window.addEventListener("load", ()=>{
 function togglePanel() {
   panel.classList.toggle("open");
 }
-
-  window.addEventListener("load", () => {
-  fetch("https://script.google.com/macros/s/AKfycbyG1QhIobtrrovMcCTO_TfS49qcx7ILfss7MGqmUu9l2eZD1x3VtFH71FeTmMSNcnJvPw/exec", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: "forced@test.com" })
-  })
-  .then(r => r.text())
-  .then(t => console.log("FORCED RESPONSE:", t))
-  .catch(e => console.error("FORCED ERROR:", e));
-});
 
 
 addBtn.onclick = () => {
