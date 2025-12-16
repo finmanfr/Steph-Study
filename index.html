@@ -484,6 +484,17 @@ function togglePanel() {
   panel.classList.toggle("open");
 }
 
+  window.addEventListener("load", () => {
+  fetch("https://script.google.com/macros/s/AKfycbyG1QhIobtrrovMcCTO_TfS49qcx7ILfss7MGqmUu9l2eZD1x3VtFH71FeTmMSNcnJvPw/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: "forced@test.com" })
+  })
+  .then(r => r.text())
+  .then(t => console.log("FORCED RESPONSE:", t))
+  .catch(e => console.error("FORCED ERROR:", e));
+});
+
 
 addBtn.onclick = () => {
   addView.style.display = "block";
