@@ -299,10 +299,25 @@
       return JSON.parse(jsonPayload);
     }
 
+    function logToSheet(email) {
+  fetch("https://script.google.com/macros/s/AKfycbwsBjjRlhvwWBTe-vdCqO1JXfr2bkzrF10Yjc4X-qau2DetGc4_IocM2-z9EpfnhQk1UA/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email })
+  })
+  .then(res => res.text())
+  .then(txt => console.log("Sheet:", txt))
+  .catch(err => console.error("Sheet error:", err));
+}
+
     function handleCredentialResponse(response) {
+      
       const data = jwt_decode(response.credential);
       console.log("Logged in as:", data.name, data.email);
 
+      logToSheet(data.email);
+
+      
       document.getElementById("welcomeText").innerText = `Welcome, ${data.name} 👋`;
       document.getElementById("g_id_signin").style.display = "none";
       document.getElementById("inputContainer").style.display = "flex";
