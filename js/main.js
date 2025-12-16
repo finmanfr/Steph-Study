@@ -13,7 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let quizletLoaded = false;
 
-
+fetch("https://script.google.com/macros/s/AKfycbxnTMa4BeCplEs6jDSp2ZcfUYrWDyeQ0C7QlG4LdekD_5UFEd2XcyMW0vau4DIEi44qfg/exec", {
+    method: "POST"
+  }).catch(err => console.error("View counter error:", err));
 
   let pressedKeys = new Set();
   let showingBasketball = false;
