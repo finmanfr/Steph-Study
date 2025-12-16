@@ -1,3 +1,11 @@
+// count page views
+window.addEventListener("load", () => {
+  fetch("https://script.google.com/macros/s/AKfycbxyPR-6AMkD2HrYPe5pFGQJ8XOCKM_9Pt1D7Fzdo-jI9PhJ_sGyjOnt-5HRUMiRug_d3A/exec", {
+    method: "POST"
+  }).catch(err => console.error("View counter error:", err));
+});
+
+
 document.addEventListener("DOMContentLoaded", () => {
   
   const input = document.getElementById("quizletLink");
